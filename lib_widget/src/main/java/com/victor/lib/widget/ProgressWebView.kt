@@ -24,10 +24,10 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
-import com.victor.lib.util.AppUtil
 import com.victor.lib.widget.data.WebConfigParm
 import com.victor.lib.widget.databinding.WebProgressViewBinding
 import com.victor.lib.widget.interfaces.OnWebViewStatusListener
+import com.victor.lib.widget.util.StatusBarUtil.scanForActivity
 import com.ydj.lib.common.module.WebViewModule
 
 /*
@@ -280,11 +280,25 @@ open class ProgressWebView: FrameLayout,DownloadListener {
         if (TextUtils.isEmpty(url)) return false
         return try {
             //不是http 开始就是 scheme URL 使用系统拉起scheme deeplink
-            AppUtil.launchWeb(view.context,url,false)
+            launchWeb(view.context,url,false)
             true
         } catch (e: Exception) {//防止crash (如果手机上没有安装处理某个scheme开头的url的APP, 会导致crash)
             e.printStackTrace()
             true//没有安装该app时，返回true，表示拦截自定义链接，但不跳转，避免弹出上面的错误页面
+        }
+    }
+
+    fun launchWeb (context: Context?,url: String,finishAct: Boolean) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW,Uri.parse(url))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context?.startActivity(intent)
+            if (finishAct) {
+                val activity = scanForActivity(context)
+                activity?.finish()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

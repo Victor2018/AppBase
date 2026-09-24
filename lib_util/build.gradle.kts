@@ -52,7 +52,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
                 groupId = "com.github.Victor2018"
-                artifactId = "victor"
+                artifactId = "lib_util"
                 version = "1.0.0"
             }
         }

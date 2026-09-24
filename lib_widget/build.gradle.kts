@@ -47,8 +47,6 @@ dependencies {
 
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.bundles.victor)
-
-    implementation(project(":lib_util"))
 }
 
 afterEvaluate {
@@ -57,7 +55,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
                 groupId = "com.github.Victor2018"
-                artifactId = "victor"
+                artifactId = "lib_widget"
                 version = "1.0.0"
             }
         }
