@@ -51,4 +51,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(project(":lib_widget"))
+//    implementation("com.github.Victor2018.AppBase:lib_util:v1.1.1")
+//    implementation("com.github.Victor2018.AppBase:lib_widget:v1.1.1")
 }
