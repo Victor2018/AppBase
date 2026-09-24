@@ -1,0 +1,76 @@
+package com.victor.lib.widget.layoutmanager
+
+import android.graphics.Rect
+import android.util.Log
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+
+
+/*
+ * -----------------------------------------------------------------
+ * Copyright (C) 2018-2028, by Victor, All rights reserved.
+ * -----------------------------------------------------------------
+ * File: FlowLayoutManager
+ * Author: Victor
+ * Date: 2023/4/3 17:11
+ * Description: 
+ * -----------------------------------------------------------------
+ */
+
+class FlowLayoutManager : RecyclerView.LayoutManager() {
+
+    override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
+        return RecyclerView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
+    override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
+        if (state.isPreLayout) {
+            return
+        }
+        detachAndScrapAttachedViews(recycler)
+        if (itemCount <= 0) {
+            return
+        }
+        var offsetX = paddingLeft
+        var offsetY = paddingTop
+
+        for (i in 0 until itemCount) {
+            val view = recycler.getViewForPosition(i)
+            addView(view)
+            measureChildWithMargins(view, 0, 0)
+            val lp = view.layoutParams as RecyclerView.LayoutParams
+            val w = getDecoratedMeasuredWidth(view) + lp.leftMargin + lp.rightMargin
+            val h = getDecoratedMeasuredHeight(view) + lp.topMargin + lp.bottomMargin
+            Log.d("Debug", "view w: $w, h: $h")
+            if (offsetX + w > width - paddingRight) {
+                offsetX = paddingLeft
+                offsetY += h
+            }
+            layoutDecoratedWithMargins(view, offsetX, offsetY, offsetX + w, offsetY + h)
+            offsetX += w
+            Log.d("Debug", "offsetX: $offsetX, offsetY: $offsetY")
+        }
+
+    }
+
+    override fun isAutoMeasureEnabled(): Boolean {
+        return true
+    }
+
+    override fun setMeasuredDimension(childrenBounds: Rect?, wSpec: Int, hSpec: Int) {
+        super.setMeasuredDimension(childrenBounds, wSpec, hSpec)
+
+        val width: Int
+        val height: Int
+        val horizontalPadding = paddingLeft + paddingRight
+        val verticalPadding = paddingTop + paddingBottom
+
+        val usedHeight = childrenBounds!!.height() + verticalPadding
+        val usedWidth = childrenBounds!!.width() + horizontalPadding
+        height = chooseSize(hSpec, usedHeight, minimumHeight)
+        width = chooseSize(wSpec, usedWidth, minimumWidth)
+        setMeasuredDimension(width, height)
+
+    }
+
+}
