@@ -52,8 +52,8 @@ dependencies {
 
     implementation(libs.androidx.swiperefreshlayout)
     implementation(project(":lib_widget"))
-//    implementation(project(":lib_base"))
+    implementation(project(":lib_base"))
 //    implementation("com.github.Victor2018.AppBase:lib_util:v1.1.1")
 //    implementation("com.github.Victor2018.AppBase:lib_widget:v1.1.1")
-    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.2")
+//    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.2")
 }
