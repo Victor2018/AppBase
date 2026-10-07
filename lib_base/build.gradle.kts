@@ -1,20 +1,18 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("maven-publish")
 }
 
 android {
-    namespace = "com.victor.app.base"
+    namespace = "com.victor.lib.base"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.victor.app.base"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -43,16 +41,27 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(libs.androidx.swiperefreshlayout)
-    implementation(project(":lib_widget"))
-    implementation(project(":lib_base"))
-//    implementation("com.github.Victor2018.AppBase:lib_util:v1.1.1")
-//    implementation("com.github.Victor2018.AppBase:lib_widget:v1.1.1")
+    api(libs.bundles.victor)
+    implementation(libs.multidex.core)
+    implementation(libs.arouter.api)
+    implementation(libs.arouter.ksp.compiler)
+
+    implementation(libs.victor.lib.widget)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.Victor2018"
+                artifactId = "lib_base"
+                version = "1.0.0"
+            }
+        }
+    }
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/dp_16"
+    android:paddingBottom="@dimen/dp_24"
+    android:paddingStart="@dimen/dp_24"
+    android:paddingEnd="@dimen/dp_24"
+    android:background="@drawable/ripple_white_radius_18"
+    android:clickable="true"
+    tools:ignore="ResourceName">
+
+    <ImageView
+        android:id="@+id/mIvMessageTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/view_dot"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@mipmap/message_ic_message_tip"/>
+
+    <View
+        android:id="@+id/view_dot"
+        android:layout_width="@dimen/dp_1"
+        android:layout_height="@dimen/dp_1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/mIvMessageTip"
+        android:layout_marginTop="@dimen/dp_24"/>
+
+    <com.victor.lib.widget.CircleView
+        android:id="@+id/mCircleReadStatus"
+        android:layout_width="@dimen/dp_12"
+        android:layout_height="@dimen/dp_12"
+        app:layout_constraintTop_toTopOf="@+id/view_dot"
+        app:layout_constraintBottom_toBottomOf="@+id/view_dot"
+        app:layout_constraintStart_toStartOf="@+id/view_dot"
+        app:layout_constraintEnd_toEndOf="@+id/view_dot"
+        app:cv_color="@color/color_FF3141"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/mTvTitle"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/mIvMessageTip"
+        app:layout_constraintStart_toEndOf="@+id/mIvMessageTip"
+        app:layout_constraintEnd_toStartOf="@+id/mTvTime"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/dp_28"
+        android:textColor="@color/color_1A1A1A"
+        android:text="您获得免费投放首页轮播图福利~"/>
+
+    <TextView
+        android:id="@+id/mTvTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/mIvMessageTip"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/dp_4"
+        android:textSize="@dimen/dp_24"
+        android:textColor="@color/color_B9BBC6"
+        tools:text="刚刚"/>
+
+    <TextView
+        android:id="@+id/mTvContent"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/mTvTitle"
+        app:layout_constraintStart_toStartOf="@+id/mTvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/dp_24"
+        android:textColor="@color/color_8B8D98"
+        android:text="专属优惠即将过期，抓紧时间采购!"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+

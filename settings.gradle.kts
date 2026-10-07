@@ -24,3 +24,4 @@ rootProject.name = "AppBase"
 include(":app")
 include(":lib_widget")
 include(":lib_util")
+include(":lib_base")

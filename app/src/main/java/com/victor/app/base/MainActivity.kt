@@ -6,16 +6,13 @@ import android.view.View.OnClickListener
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.victor.app.base.databinding.ActivityMainBinding
+import com.victor.lib.base.BaseActivity
 
-class MainActivity : AppCompatActivity(),OnClickListener {
+class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate),OnClickListener {
 
-    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
 
@@ -31,7 +28,7 @@ class MainActivity : AppCompatActivity(),OnClickListener {
                     .setAnchorView(R.id.fab).show()
             }
             R.id.mBtnLoadMore -> {
-
+                LoadMoreActivity.intentStart(this)
             }
         }
     }
