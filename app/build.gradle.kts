@@ -27,11 +27,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         viewBinding = true
@@ -55,5 +55,5 @@ dependencies {
     implementation(project(":lib_base"))
 //    implementation("com.github.Victor2018.AppBase:lib_util:v1.1.1")
 //    implementation("com.github.Victor2018.AppBase:lib_widget:v1.1.1")
-//    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.2")
+//    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.3")
 }
