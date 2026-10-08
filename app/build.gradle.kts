@@ -55,5 +55,5 @@ dependencies {
     implementation(project(":lib_base"))
 //    implementation("com.github.Victor2018.AppBase:lib_util:v1.1.1")
 //    implementation("com.github.Victor2018.AppBase:lib_widget:v1.1.1")
-//    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.3")
+//    implementation("com.github.Victor2018.AppBase:lib_base:v1.1.5")
 }
