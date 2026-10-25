@@ -57,7 +57,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             android:textColor="@color/white"
-                            android:text="消息"/>
+                            android:text="下拉刷新，上拉加载更多"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoadMoreActivity"/>
+        <activity android:name=".StickyItemDecorationActivity"/>
+        <activity android:name=".BreatheRedViewActivity"/>
+        <activity android:name=".ExpandableLayoutActivity"/>
+        <activity android:name=".FlowLayoutManagerActivity"/>
+        <activity android:name=".PagerGridLayoutManagerActivity"/>
     </application>
 
 </manifest>

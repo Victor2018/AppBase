@@ -1,16 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
+    android:padding="@dimen/dp_24"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <Button
-        android:id="@+id/mBtnLoadMore"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="下拉刷新，上拉加载更多"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <Button
+            android:id="@+id/mBtnLoadMore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="下拉刷新，上拉加载更多"/>
+
+        <Button
+            android:id="@+id/mBtnStickyItemDecoration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="分组吸顶"/>
+
+        <Button
+            android:id="@+id/mBtnBreatheRedView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="呼吸灯"/>
+
+        <Button
+            android:id="@+id/mExpandableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="可展开布局"/>
+
+        <Button
+            android:id="@+id/mFlowLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="标签layoutmanager"/>
+
+        <Button
+            android:id="@+id/mPagerGridLayoutManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="分页layoutmanager"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

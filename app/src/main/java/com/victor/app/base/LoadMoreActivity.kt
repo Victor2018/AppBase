@@ -75,11 +75,6 @@ class LoadMoreActivity : BaseActivity<ActivityLoadMoreBinding>(ActivityLoadMoreB
             R.id.mIvBack -> {
                 finish()
             }
-            R.id.fab -> {
-                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .setAnchorView(R.id.fab).show()
-            }
             R.id.mBtnLoadMore -> {
 
             }

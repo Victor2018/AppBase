@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mTvUnit"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/dp_32"
+    android:layout_marginStart="@dimen/dp_10"
+    android:layout_marginEnd="@dimen/dp_32"
+    android:padding="@dimen/dp_18"
+    android:background="@drawable/shape_f9f9f9_radius_10"
+    android:gravity="center"
+    android:textStyle="bold"
+    android:textColor="@color/color_1A1A1A"
+    android:textSize="@dimen/dp_28"
+    tools:text="箱"
+    tools:ignore="ResourceName" />

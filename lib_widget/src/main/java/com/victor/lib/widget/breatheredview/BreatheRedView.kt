@@ -20,7 +20,7 @@ import com.victor.lib.widget.util.ViewUtils.show
  */
 
 class BreatheRedView : View {
-    var showAnim = false
+    var showAnim = true
 
     private var mObjectAnimator: ObjectAnimator? = null
 

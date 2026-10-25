@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.victor.lib.widget.ColorSwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mSrlRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ResourceName">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:elevation="0dp">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/mCtlTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                app:contentScrim="?attr/colorPrimary"
+                app:titleEnabled="false">
+
+                <androidx.appcompat.widget.Toolbar
+                    style="@style/ToolbarStyle"
+                    app:title="@string/app_name">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/mIvBack"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:layout_marginStart="@dimen/dp_14"
+                            android:padding="@dimen/dp_10"
+                            android:src="@mipmap/ic_back_white"/>
+
+                        <TextView
+                            android:id="@+id/mTvTitle"
+                            style="@style/ToolbarTitleStyle"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:textColor="@color/white"
+                            android:text="ExpandableLayout"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.appcompat.widget.Toolbar>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_24"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:ignore="ResourceName">
+
+            <TextView
+                android:id="@+id/mTvReceiptPoint"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_88"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:paddingStart="@dimen/dp_24"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:textColor="@color/color_1A1A1A"
+                android:textSize="@dimen/dp_28"
+                android:text="武汉站接货点"/>
+
+            <TextView
+                android:id="@+id/mTvExpand"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_88"
+                app:layout_constraintBottom_toBottomOf="@+id/mTvReceiptPoint"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingStart="@dimen/dp_24"
+                android:paddingEnd="@dimen/dp_24"
+                android:drawableEnd="@mipmap/order_ic_receipt_point_up"
+                android:drawablePadding="@dimen/dp_8"
+                android:gravity="center"
+                android:textSize="@dimen/dp_28"
+                android:textColor="@color/color_999999"
+                android:text="收起"/>
+
+            <com.victor.lib.widget.expandablelayout.ExpandableLayout
+                android:id="@+id/mElReceiptPoint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/mTvReceiptPoint"
+                app:el_duration="300"
+                app:el_expanded="true"
+                app:el_parallax="0.5">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_300"
+                    android:paddingStart="@dimen/dp_24"
+                    android:paddingEnd="@dimen/dp_24"
+                    android:textSize="@dimen/dp_28"
+                    android:textColor="@color/color_8B8D98"
+                    android:text="ExpandableLayout 是一个支持内容动态展开与折叠的自定义布局，提供纵向和横向两种展开方向，并可通过平滑动画提升交互体验。它支持自定义动画时长、默认展开状态及内容视差效果，同时提供展开进度和状态变化回调，还能在界面重建后恢复折叠状态，适用于详情展示、筛选条件、更多内容等需要节省页面空间的场景。"/>
+
+            </com.victor.lib.widget.expandablelayout.ExpandableLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</com.victor.lib.widget.ColorSwipeRefreshLayout>
+
+
+
+
+
+
+
+
+
+
