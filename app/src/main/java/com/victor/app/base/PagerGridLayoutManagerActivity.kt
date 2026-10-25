@@ -8,12 +8,13 @@ import android.view.View.OnClickListener
 import android.widget.AdapterView
 import com.victor.app.base.adapter.FinanceMonthAdapter
 import com.victor.app.base.databinding.ActivityFlowLayoutmanagerBinding
+import com.victor.app.base.databinding.ActivityPagerGridLayoutmanagerBinding
 import com.victor.lib.base.BaseActivity
 import com.victor.lib.widget.layoutmanager.FlowLayoutManager
 import com.victor.lib.widget.pagerlayoutmanager.PagerGridLayoutManager
 import com.victor.lib.widget.util.Loger
 
-class PagerGridLayoutManagerActivity : BaseActivity<ActivityFlowLayoutmanagerBinding>(ActivityFlowLayoutmanagerBinding::inflate),
+class PagerGridLayoutManagerActivity : BaseActivity<ActivityPagerGridLayoutmanagerBinding>(ActivityPagerGridLayoutmanagerBinding::inflate),
     OnClickListener, AdapterView.OnItemClickListener {
 
     companion object {
