@@ -23,6 +23,8 @@ multidex = '1.0.3'
 arouter = '1.5.2'
 arouter_processor = '1.5.2'
 arouter_ksp_compiler = '1.6.10-1.0.3'
+ali_pay = '15.7.4'
+qmf_ppplugin_android = '3.1.8'
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +42,8 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 victor-match = { group = "com.github.Victor2018", name = "ScreenMatchLib", version.ref = "match" }
 victor-easypermissions = { group = "com.github.Victor2018", name = "easypermissions", version.ref = "easypermissions" }
 victor-lib-widget = { group = "com.github.Victor2018.AppBase", name = "lib_widget", version.ref = "lib_widget" }
+aar_ali-pay = { group = "com.victor.lib.aar",name="alipay-sdk", version.ref = "ali_pay" }
+aar_qmf-ppplugin-android = { group = "com.victor.lib.aar",name="qmf-ppplugin-android", version.ref = "qmf_ppplugin_android" }
 
 #third
 multidex-core = { group = "com.android.support", name = "multidex", version.ref = "multidex" }
@@ -48,6 +52,7 @@ arouter-ksp-compiler = { group = "com.github.JailedBird", name = "ArouterKspComp
 
 [bundles]
 victor = ["victor-match", "victor-easypermissions"]
+lib_aar = ["aar_ali-pay", "aar_qmf-ppplugin-android"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

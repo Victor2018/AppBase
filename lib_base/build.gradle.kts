@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 23
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -46,6 +46,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     api(libs.bundles.victor)
+    api(libs.bundles.lib.aar)
     implementation(libs.multidex.core)
     implementation(libs.arouter.api)
     implementation(libs.arouter.ksp.compiler)

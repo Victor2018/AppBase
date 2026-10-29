@@ -17,6 +17,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        // 本地 Maven 仓库 - 用于 AAR
+        maven { url = uri("${rootDir}/repo") }
     }
 }
 
@@ -25,3 +27,4 @@ include(":app")
 include(":lib_widget")
 include(":lib_util")
 include(":lib_base")
+include(":lib_aar")
