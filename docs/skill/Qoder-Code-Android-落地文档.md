@@ -187,15 +187,15 @@ Figma MCP 需要个人访问令牌（Personal Access Token）才能读取设计�
 7. 点击「Generate token」。
 8. **立即复制 token**，页面关闭后无法再次查看。
 
-![Figma：头像 → Settings](docs/figma_1.png)
+![Figma：头像 → Settings](images/figma_1.png)
 
-![Figma：Security → Personal access tokens → Generate new token](docs/figma_2.png)
+![Figma：Security → Personal access tokens → Generate new token](images/figma_2.png)
 
-![Figma：填写 Token 名称和有效期，勾选只读权限](docs/figma_3.png)
+![Figma：填写 Token 名称和有效期，勾选只读权限](images/figma_3.png)
 
-![Figma：继续勾选文件、设计系统等只读权限](docs/figma_4.png)
+![Figma：继续勾选文件、设计系统等只读权限](images/figma_4.png)
 
-![Figma：确认权限后点击 Generate token](docs/figma_5.png)
+![Figma：确认权限后点击 Generate token](images/figma_5.png)
 
 > 点击「Generate token」后立即复制并保存。为避免凭证泄露，本文档不展示包含真实 token 的截图；分享材料前也请勿使用带 token 的截图。
 
@@ -214,11 +214,11 @@ Figma MCP 需要个人访问令牌（Personal Access Token）才能读取设计�
 5. 点击右上角「+ 创建个人访问令牌」。
 6. 填写名称，例如 `qoder_ai`，创建后立即复制令牌。
 
-![TAPD：头像 → 我的设置](docs/tapd_1.png)
+![TAPD：头像 → 我的设置](images/tapd_1.png)
 
-![TAPD：个人设置 → 个人访问令牌](docs/tapd_2.png)
+![TAPD：个人设置 → 个人访问令牌](images/tapd_2.png)
 
-![TAPD：创建个人访问令牌](docs/tapd_3.png)
+![TAPD：创建个人访问令牌](images/tapd_3.png)
 
 > TAPD 令牌通常只显示一次。创建后先保存到本地密码管理器，再填入 MCP 配置。
 
@@ -279,11 +279,11 @@ Figma MCP 需要个人访问令牌（Personal Access Token）才能读取设计�
 8. 点击「预览导入」，确认后保存。
 9. 回到「扩展管理」→「连接器」，确认 `figma_mcp` 和 `tapd_mcp` 显示「可用」，并打开右侧开关。
 
-![Qoder CN 桌面端：扩展 → 连接器 → 添加连接器](docs/qoder_cn_desktop_mcp_1.png)
+![Qoder CN 桌面端：扩展 → 连接器 → 添加连接器](images/qoder_cn_desktop_mcp_1.png)
 
 > 「添加自定义 MCP」截图中的 JSON 会包含真实 API Key，本文档不嵌入该截图。请按界面选择 JSON 标签，粘贴第 2.3 节的脱敏模板并填入本地 token，然后点击「预览导入」。
 
-![Qoder CN 桌面端：扩展管理 → 连接器，确认两个 MCP 可用](docs/qoder_cn_desktop_mcp_3.png)
+![Qoder CN 桌面端：扩展管理 → 连接器，确认两个 MCP 可用](images/qoder_cn_desktop_mcp_3.png)
 
 **配置文件位置**
 
@@ -315,7 +315,7 @@ C:\Users\<用户名>\.qoder-cn\shared_client\mcp.json
 7. 确认 `figma_mcp` 和 `tapd_mcp` 的状态为「已连接」，并勾选「已启用」。
 8. 如果状态没有变化，重启 Android Studio。
 
-![Android Studio Qoder CN 插件：Settings → Other Settings → Qoder CN → MCP 服务器](docs/qoder_cn_ide_plugin_mcp.png)
+![Android Studio Qoder CN 插件：Settings → Other Settings → Qoder CN → MCP 服务器](images/qoder_cn_ide_plugin_mcp.png)
 
 > 桌面端和 IDE 插件可能使用不同的配置文件：桌面端是 `~/.qoder-cn/settings.json`，插件是 `~/.qoder-cn/shared_client/mcp.json`。两端都要用，就两端都配置。
 
@@ -1078,12 +1078,12 @@ TAPD Bug
 
 ### 8.4 图片无法显示
 
-本文档中的图片使用相对路径 `docs/xxx.png`。请保持 Markdown 文件与 `docs` 目录在同一级：
+本文档中的图片使用相对路径 `images/xxx.png`。请保持 Markdown 文件与 `images` 目录在同一级：
 
 ```
 victor/skill/
 ├── Qoder-Code-Android-落地文档.md
-└── docs/
+└── images/
     ├── figma_1.png
     ├── tapd_1.png
     └── qoder_cn_desktop_mcp_1.png
