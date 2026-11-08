@@ -1,5 +1,5 @@
 ---
-name: figma-to-android-xml
+name: figma-android-ui
 description: 将 Figma 设计稿转换为符合 Android 项目规范的 XML 布局文件。使用场景：当用户提供 Figma、MasterGo、即时设计、蓝湖、Sketch、Adobe XD、Photoshop 等设计工具的链接或设计稿截图，需要生成对应的 Android XML 布局代码、Kotlin Activity/Fragment 代码时触发。
 ---
 

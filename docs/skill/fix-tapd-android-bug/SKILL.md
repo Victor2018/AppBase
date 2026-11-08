@@ -1,5 +1,5 @@
 ---
-name: tapd-bug-fixer
+name: fix-tapd-android-bug
 description: 通过 TAPD MCP 工具获取 bug 详情并修复代码。触发：用户提供 TAPD bug 链接或说"修复这个 bug"。使用 tapd_list_workspaces、tapd_get_bugs 等 MCP 工具。
 tools:
   - mcp__tapd_mcp__*

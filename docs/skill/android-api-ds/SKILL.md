@@ -1,7 +1,7 @@
 ---
-name: android_api_ds
+name: android-api-ds
 description: 根据接口文档生成符合 Android 项目规范的网络请求代码。使用场景：当用户提供 Swagger/Knife4j 接口文档链接或截图，需要生成请求实体类、响应实体类、API接口、DataSource、ViewModel 等完整网络请求链路代码时触发。适用于所有采用 Retrofit + MVVM 架构的 Android 项目。
-version: 2.0.0
+version: 2.0.1
 ---
 
 # Android API 数据连接生成器
@@ -50,7 +50,7 @@ version: 2.0.0
 | 接口路径 | API URL | user/front/subaccount/add |
 | 请求方法 | HTTP方法 | POST / GET / PUT / DELETE |
 | 请求参数 | 字段列表 | phone: String, realName: String |
-| 响应数据 | 返回字段 | id: Long, name: String |
+| 响应数据 | 返回字段（无返回时泛型用 `Nothing`） | id: Long, name: String |
 
 ### 2. 确认项目配置
 
@@ -166,10 +166,11 @@ NetworkResponse<BaseRes<List<SubAccountData>>, HttpError>
 ```
 
 ### 无数据返回
-使用 `Any?` 作为泛型：
+接口文档中 `data` 为空或无返回字段时，泛型使用 `Nothing`，表示该接口没有数据返回，禁止使用 `Any?`：
 ```kotlin
-NetworkResponse<BaseRes<Any?>, HttpError>
+NetworkResponse<BaseRes<Nothing>, HttpError>
 ```
+后续 DataSource、ViewModel 中的 `LiveData<HttpResult<BaseRes<...>>>` 同样使用 `Nothing`。
 
 ## 检查清单
 
@@ -195,6 +196,7 @@ NetworkResponse<BaseRes<Any?>, HttpError>
 ### 架构一致性检查
 - [ ] ApiService 使用 `suspend` 函数
 - [ ] 返回类型使用项目统一的响应封装
+- [ ] 无数据返回的接口使用 `Nothing` 泛型，禁止使用 `Any?`
 - [ ] DataSource 继承项目基类（如有）
 - [ ] ViewModel 使用 `viewModelScope.launch`
 - [ ] LiveData 类型正确
@@ -219,6 +221,10 @@ NetworkResponse<BaseRes<Any?>, HttpError>
 - `HttpResult<T>` / `Result<T>` / `Resource<T>`
 
 ## 更新日志
+
+### v2.0.1
+- 无数据返回的接口统一使用 `Nothing` 泛型，禁止使用 `Any?`
+- 检查清单新增无数据返回类型校验项
 
 ### v2.0.0
 - 移除项目特定依赖，改为通用架构

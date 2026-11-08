@@ -205,6 +205,15 @@ suspend fun get{模块}List(
 ): NetworkResponse<BaseRes<List<{模块}Data>>, HttpError>
 ```
 
+### 无数据返回
+
+`data` 为空或接口无返回字段时，泛型使用 `Nothing`（不要使用 `Any?`）：
+
+```kotlin
+@POST({模块}Api.{动作大写})
+suspend fun {动作}{模块}(@Body body: {动作}{模块}Req?): NetworkResponse<BaseRes<Nothing>, HttpError>
+```
+
 ### 完整示例
 
 ```kotlin
@@ -229,7 +238,7 @@ interface SubAccountApiService {
 
     /** 添加子账号 */
     @POST(SubAccountApi.ADD)
-    suspend fun addSubAccount(@Body body: AddSubAccountReq?): NetworkResponse<BaseRes<Any?>, HttpError>
+    suspend fun addSubAccount(@Body body: AddSubAccountReq?): NetworkResponse<BaseRes<Nothing>, HttpError>
 
     /** 获取子账号列表 */
     @GET(SubAccountApi.GET_LIST)
@@ -246,11 +255,11 @@ interface SubAccountApiService {
 
     /** 更新子账号 */
     @POST(SubAccountApi.UPDATE)
-    suspend fun updateSubAccount(@Body body: UpdateSubAccountReq?): NetworkResponse<BaseRes<Any?>, HttpError>
+    suspend fun updateSubAccount(@Body body: UpdateSubAccountReq?): NetworkResponse<BaseRes<Nothing>, HttpError>
 
     /** 删除子账号 */
     @POST(SubAccountApi.DELETE)
-    suspend fun deleteSubAccount(@Query("id") id: Long?): NetworkResponse<BaseRes<Any?>, HttpError>
+    suspend fun deleteSubAccount(@Query("id") id: Long?): NetworkResponse<BaseRes<Nothing>, HttpError>
 }
 ```
 
@@ -299,11 +308,11 @@ import {网络库包名}.data.HttpResult
  * 子账号管理数据源接口
  */
 interface ISubAccountDS {
-    val addData: LiveData<HttpResult<BaseRes<Any?>>>
+    val addData: LiveData<HttpResult<BaseRes<Nothing>>>
     val listData: LiveData<HttpResult<BaseRes<List<SubAccountData>>>>
     val detailData: LiveData<HttpResult<BaseRes<SubAccountData>>>
-    val updateData: LiveData<HttpResult<BaseRes<Any?>>>
-    val deleteData: LiveData<HttpResult<BaseRes<Any?>>>
+    val updateData: LiveData<HttpResult<BaseRes<Nothing>>>
+    val deleteData: LiveData<HttpResult<BaseRes<Nothing>>>
 
     suspend fun add(body: AddSubAccountReq?)
     suspend fun getList(page: Int?, pageSize: Int?)
@@ -375,11 +384,11 @@ import kotlinx.coroutines.withContext
  */
 class SubAccountDS : AbsDS(), ISubAccountDS {
 
-    override val addData = MutableLiveData<HttpResult<BaseRes<Any?>>>()
+    override val addData = MutableLiveData<HttpResult<BaseRes<Nothing>>>()
     override val listData = MutableLiveData<HttpResult<BaseRes<List<SubAccountData>>>>()
     override val detailData = MutableLiveData<HttpResult<BaseRes<SubAccountData>>>()
-    override val updateData = MutableLiveData<HttpResult<BaseRes<Any?>>>()
-    override val deleteData = MutableLiveData<HttpResult<BaseRes<Any?>>>()
+    override val updateData = MutableLiveData<HttpResult<BaseRes<Nothing>>>()
+    override val deleteData = MutableLiveData<HttpResult<BaseRes<Nothing>>>()
 
     override suspend fun add(body: AddSubAccountReq?) {
         withContext(Dispatchers.Main) {
@@ -492,11 +501,11 @@ import kotlinx.coroutines.launch
  */
 class SubAccountVM(private val dataSource: ISubAccountDS) : ViewModel() {
 
-    val addResult: LiveData<HttpResult<BaseRes<Any?>>> = dataSource.addData
+    val addResult: LiveData<HttpResult<BaseRes<Nothing>>> = dataSource.addData
     val listResult: LiveData<HttpResult<BaseRes<List<SubAccountData>>>> = dataSource.listData
     val detailResult: LiveData<HttpResult<BaseRes<SubAccountData>>> = dataSource.detailData
-    val updateResult: LiveData<HttpResult<BaseRes<Any?>>> = dataSource.updateData
-    val deleteResult: LiveData<HttpResult<BaseRes<Any?>>> = dataSource.deleteData
+    val updateResult: LiveData<HttpResult<BaseRes<Nothing>>> = dataSource.updateData
+    val deleteResult: LiveData<HttpResult<BaseRes<Nothing>>> = dataSource.deleteData
 
     fun add(body: AddSubAccountReq?) {
         viewModelScope.launch { dataSource.add(body) }
