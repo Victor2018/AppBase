@@ -2,9 +2,9 @@
 
 > 适用对象：Android 客户端开发、测试、技术负责人
 >
-> 覆盖范围：Qoder CN 桌面端 + Android Studio Qoder CN 插件；MCP 配置、Skill 安装、Commands 编排、三个 Skill 的落地流程、效率分析与质量验收
+> 覆盖范围：Qoder CN 桌面端 + Android Studio Qoder CN 插件为主；Skill 与 Command 可复用到 Cursor、Trae、CodeBuddy、Claude Code 等客户端。内容包含 MCP 配置、Skill 安装、Commands 编排、三个 Skill 的落地流程、跨工具复用、效率分析与质量验收
 >
-> 版本：v1.2 ｜ 日期：2026-11-11
+> 版本：v1.3 ｜ 日期：2026-11-11
 
 ---
 
@@ -32,6 +32,8 @@
 - **MCP 解决「读得到」**：Figma、TAPD、Swagger 的数据通道。
 - **Skill 解决「做得对」**：单点任务的规范、模板和验收清单。
 - **Command 解决「串得起来」**：阶段顺序、交接门禁、确认停止点由命令固化，不依赖人记流程。
+
+Skill 和 Command 都不是 Qoder 专有能力：Skill 是遵循开放约定的 Markdown 指令包，Command 是一份 Markdown 编排提示词。换到 Cursor、Trae、CodeBuddy、Claude Code 等客户端时，规范内容和流程不变，只需要换安装目录和触发方式，见 0.6。
 
 ### 0.3 三个 Skill 一页速览
 
@@ -85,7 +87,78 @@ Skill 是单点能力，Command 是把单点能力串成流水线的编排层。
 - `/android-review` 可以脱离流水线单独使用，作为提交前的统一审查入口。
 - 命令的安装与验证见 3.6，完整用法与示例见 4.5。
 
-### 0.6 前置条件
+### 0.6 跨客户端复用：Skill 与 Command 不绑定 Qoder
+
+本项目的三个 Skill 和两个 Command 不是 Qoder 专属资产，可以在使用不同客户端的团队成员之间共享。
+
+- **Skill 是开放格式**：一个目录 + `SKILL.md`（YAML frontmatter + Markdown 正文）+ 可选的 `references/`、`scripts/`。这是 Agent Skills 的通用约定，Cursor、Trae、CodeBuddy、Claude Code 等客户端都能直接读取同一份内容。
+- **Command 是普通 Markdown**：正文写的是阶段顺序、门禁和停止点，不调用任何 Qoder 专有接口。
+
+换客户端时，规范与流程不变，要改的只有「放在哪、怎么触发」：
+
+| 要素 | 是否通用 | 说明 |
+|---|---|---|
+| `SKILL.md` 正文与 `references/` | 通用 | 纯 Markdown，与工具无关，不需要改写 |
+| frontmatter 的 `name` / `description` | 通用，但更关键 | 多数客户端靠 `description` 自动匹配，描述要写清「做什么 + 何时用」 |
+| Skill 安装目录 | 不通用 | 各客户端目录不同，见下方对照表 |
+| Command 正文 | 通用 | 斜杠命令、规则文件、固定 Prompt 都能承载 |
+| Command 的调用入口 | 不通用 | 名称、斜杠语法、是否支持自定义命令因工具而异 |
+| MCP 配置 | 不通用 | 配置文件位置和启用开关不同，需按各客户端文档单独配置 |
+
+**Skill 目录对照**
+
+| 客户端 | 项目级（团队共享） | 用户级（个人） |
+|---|---|---|
+| Qoder CN | `.qoder/skills/` | `~/.qoder-cn/skills/` |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
+| Cursor | `.cursor/skills/` | `~/.cursor/skills/` |
+| Trae | `.trae/skills/` | `~/.trae/skills/` |
+| CodeBuddy | `.codebuddy/skills/` | `~/.codebuddy/skills/` |
+
+> 各客户端迭代较快，目录名和加载机制可能调整。安装前以该客户端当前版本的官方说明为准；目录名对不上时，先用 `/skills list` 或设置页确认它实际扫描的位置。
+
+**Command 的承载方式**
+
+| 客户端 | 推荐方式 |
+|---|---|
+| Qoder CN | 放进 `commands/`，用 `/android-feature`、`/android-review` 调用 |
+| Claude Code | `commands/` 下的 Markdown 同样映射为斜杠命令 |
+| Cursor / Trae / CodeBuddy | 支持自定义命令时放对应命令目录；不支持时把命令正文作为规则文件或固定 Prompt 使用，由人按阶段推进 |
+
+不管用哪种方式，Command 都只是编排层：规范仍由 Skill 提供，数据仍由 MCP 提供。客户端不支持自定义命令，不影响 Skill 单独使用，只是少了一层流水线。
+
+**一份源，多处复用**
+
+同时使用多个客户端时，不要把 Skill 复制成多份分别维护，否则很快出现版本漂移，A 工具改过的规则在 B 工具里还是旧的。
+
+```bash
+# macOS / Linux：把共享目录软链到各客户端
+ln -s ~/shared-skills ~/.qoder-cn/skills
+ln -s ~/shared-skills ~/.cursor/skills
+ln -s ~/shared-skills ~/.trae/skills
+ln -s ~/shared-skills ~/.codebuddy/skills
+```
+
+```bat
+:: Windows：目录联接（/J 不需要管理员权限，跨盘也可用）
+mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
+```
+
+团队协作仍推荐项目级安装：把 `.qoder/skills/`、`.qoder/commands/` 提交到仓库，Skill 正文只维护这一份；其他客户端需要时，按上表软链或同步到自己的目录，不要各改一版。
+
+**跨工具差异（实际会遇到）**
+
+| 差异 | 表现 | 处理 |
+|---|---|---|
+| 自动触发不稳定 | 有的客户端不自动匹配 `description` | 显式写「使用 figma-android-ui 技能处理这个设计稿」 |
+| 不支持 references 按需加载 | 只读 `SKILL.md`，忽略子目录 | 让工具先读指定 reference，或把关键规范直接贴进对话 |
+| 不支持 MCP | 读不到 Figma、TAPD | 用截图、导出的接口文档作为输入，并相应提高人工校准要求 |
+| 斜杠命令不可用 | 输入 `/` 看不到命令 | 按上面的承载方式改成规则文件或固定 Prompt |
+| 命令里写死了 Skill 路径 | 换客户端后路径不存在 | 命令正文优先按 Skill 名称引用，实际路径由安装位置决定 |
+
+> 跨工具复用的是「规范与流程」，不是「效果完全一致」。各客户端的模型、上下文窗口和工具调用能力不同，生成结果仍要按第 6 节的质量门禁验收。
+
+### 0.7 前置条件
 
 | 项目 | 要求 |
 |---|---|
@@ -97,6 +170,8 @@ Skill 是单点能力，Command 是把单点能力串成流水线的编排层。
 | TAPD | 有目标项目空间和 Bug 的访问权限 |
 | 编译环境 | 本地能正常执行 Gradle 构建，便于生成后验证 |
 | 网络 | 能访问 npm 源、Figma API、TAPD API |
+
+> 使用 Cursor、Trae、CodeBuddy、Claude Code 等其他客户端时，把「Qoder CN 桌面端」「Android Studio」两行替换成对应客户端即可；Node.js、工程结构、Figma/TAPD 权限和编译环境的要求不变，Skill 与 Command 的放置位置按 0.6 的对照表调整。
 
 **技术栈前提**
 
@@ -405,6 +480,8 @@ Skill 支持用户级和项目级两种安装方式：
 - 个人日常开发使用用户级。
 - 团队统一规范使用项目级，把 `.qoder/skills/` 提交到仓库，保证所有人使用同一版本。
 
+> 上表是 Qoder 的路径。使用 Cursor、Trae、CodeBuddy、Claude Code 等客户端时，Skill 正文不用修改，只需放到对应目录（如 `.cursor/skills/`、`.trae/skills/`、`.codebuddy/skills/`），完整对照见 0.6。
+
 ### 3.2 目录结构
 
 把三个 Skill 文件夹放到 skills 目录下：
@@ -516,6 +593,9 @@ commands/
 - frontmatter 只写 `description`，用于斜杠列表中的说明。
 - 命令正文里引用的 Skill 路径必须是本机真实存在的路径；项目级安装时，路径改成团队约定的位置。
 - Command 依赖 3.1~3.3 节安装的三个 Skill，先装 Skill 再装 Command。
+- 命令正文引用 Skill 时优先写名称（如 `figma-android-ui`），不要写死客户端专属的绝对路径，便于在其他客户端复用。
+
+> 其他客户端没有自定义斜杠命令机制时，把命令正文当作规则文件或固定 Prompt 使用即可，编排逻辑不变，见 0.6。
 
 **加载与验证**
 
@@ -1247,6 +1327,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 | 触发了但没有工具 | MCP 未启用 | 在桌面端或 IDE 中打开连接器开关 |
 | 生成代码不符合项目 | references 未适配 | 更新基类、包名、响应封装等配置 |
 | 生成结果放错模块 | 未做项目认知 | 先读架构文档，再指定模块和目录 |
+| 换用 Cursor/Trae/CodeBuddy 后技能不出现 | 各客户端 Skill 目录不同 | 按 0.6 的对照表放置或建软链，`SKILL.md` 正文不用改 |
 
 ### 8.3 生成结果相关
 
@@ -1284,6 +1365,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 | 想每阶段确认却一路跑完 | 输入了 `-y` | 去掉 `-y`；或在任务开始时说明「每阶段停下等我确认」 |
 | 命令只跑了 UI 就结束 | 未提供接口文档，或接口未定稿 | 补齐接口文档；按 4.5 的「什么时候用命令」改为单点 Skill |
 | 命令与项目级 Skill 冲突 | 项目级和用户级同名 Skill 并存 | 只保留一处；团队规范统一用项目级 |
+| 换用其他客户端后 `/` 里没有命令 | 该客户端不支持自定义斜杠命令 | 把命令正文作为规则文件或固定 Prompt 使用；Skill 仍可单独触发（见 0.6） |
 
 ---
 
@@ -1617,3 +1699,4 @@ module_*/src/main/res/
 | v1.0 | 2026-11-06 | 初始版本：MCP 配置、Skill 安装、三个 Skill 落地、质量门禁与排查 |
 | v1.1 | 2026-11-06 | 合并技术分享内容：Skill 定位与效率分析、规范与元素映射、边界风险、落地路线、速查表与分享提纲 |
 | v1.2 | 2026-11-11 | 新增 Commands：安装与验证、`/android-feature` 四阶段流水线、`/android-review` 双规范审查、输入解析与 `-y` 门禁、故障排查与速查；统一 Skill 命名为 `android-api-ds` / `fix-tapd-android-bug` |
+| v1.3 | 2026-11-11 | 新增 0.6 跨客户端复用：Skill 与 Command 不绑定 Qoder，可用于 Cursor、Trae、CodeBuddy、Claude Code 等客户端；补充目录对照、Command 承载方式、共享安装与跨工具差异 |
