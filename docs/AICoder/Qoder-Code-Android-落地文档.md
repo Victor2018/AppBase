@@ -2,9 +2,9 @@
 
 > 适用对象：Android 客户端开发、测试、技术负责人
 >
-> 覆盖范围：Qoder CN 桌面端 + Android Studio Qoder CN 插件；MCP 配置、Skill 安装、三个 Skill 的落地流程、效率分析与质量验收
+> 覆盖范围：Qoder CN 桌面端 + Android Studio Qoder CN 插件；MCP 配置、Skill 安装、Commands 编排、三个 Skill 的落地流程、效率分析与质量验收
 >
-> 版本：v1.1 ｜ 日期：2026-11-06
+> 版本：v1.2 ｜ 日期：2026-11-11
 
 ---
 
@@ -12,28 +12,34 @@
 
 ### 0.1 最终目标
 
-让 Qoder 在 Android 项目中具备三项能力：
+让 Qoder 在 Android 项目中具备四项能力：
 
 1. **读设计稿**：通过 Figma MCP 读取设计结构和图片，生成符合项目规范的 XML 与页面代码。
 2. **读缺陷单**：通过 TAPD MCP 读取 Bug 详情、评论和流转记录，分析根因并修复。
 3. **按项目规范产出**：通过三个 Skill 约束目录结构、命名、分层、资源位置和验收标准。
+4. **一键串联流程**：通过 Commands 把「UI → 接口 → 数据上屏 → 审查」固定成一条命令，减少阶段遗漏和人工交接。
 
-### 0.2 先区分 MCP 与 Skill
+### 0.2 先区分 MCP、Skill 与 Command
 
 | 概念 | 作用 | 本项目的例子 |
 |---|---|---|
 | MCP | 给 AI 提供工具和数据通道 | Figma MCP 读取设计稿；TAPD MCP 读取 Bug |
-| Skill | 给 AI 提供流程、规范和检查清单 | 设计稿怎么转 XML、接口链路怎么分层、Bug 怎么定位 |
+| Skill | 给 AI 提供单点任务的流程、规范和检查清单 | 设计稿怎么转 XML、接口链路怎么分层、Bug 怎么定位 |
+| Command | 把多个 Skill 和 MCP 调用按固定顺序、固定门禁编排成一条可复用指令 | `/android-feature` 串起 UI → 接口 → 上屏 → 审查；`/android-review` 双规范审查 |
 
-两者缺一不可：只有 MCP，AI 能读到数据但不知道项目规范；只有 Skill，AI 知道规范但读不到 Figma/TAPD。
+三者缺一不可：只有 MCP，AI 能读到数据但不知道项目规范；只有 Skill，AI 知道规范但读不到 Figma/TAPD，而且需要人逐个触发；只有 Command，能串起流程但每个环节没有可依据的规范。
+
+- **MCP 解决「读得到」**：Figma、TAPD、Swagger 的数据通道。
+- **Skill 解决「做得对」**：单点任务的规范、模板和验收清单。
+- **Command 解决「串得起来」**：阶段顺序、交接门禁、确认停止点由命令固化，不依赖人记流程。
 
 ### 0.3 三个 Skill 一页速览
 
 | Skill | 解决什么问题 | 输入 | 主要产出 | 覆盖阶段 |
 |---|---|---|---|---|
 | `figma-android-ui` | 设计稿到 XML 布局的重复还原与命名不统一 | Figma / MasterGo / 即时设计 / 蓝湖 / Sketch / XD / PS 链接或截图 | XML 布局、Activity/Fragment 代码、资源命名与切图清单 | UI 开发 |
-| `android_api_ds` | 一个接口要写 8~9 个文件，容易漏层、漏字段 | Swagger / Knife4j 文档链接或截图 | Req、Data、Api、ApiService、IDS、DS、VM、VMFactory、InjectorUtils | 接口联调 |
-| `fix_tapd_android_bug` | Bug 上下文分散，描述与评论不一致，修复易漏文案 | TAPD Bug 链接或 Bug ID | 根因分析、修复方案、代码修改 | 提测与缺陷修复 |
+| `android-api-ds` | 一个接口要写 8~9 个文件，容易漏层、漏字段 | Swagger / Knife4j 文档链接或截图 | Req、Data、Api、ApiService、IDS、DS、VM、VMFactory、InjectorUtils | 接口联调 |
+| `fix-tapd-android-bug` | Bug 上下文分散，描述与评论不一致，修复易漏文案 | TAPD Bug 链接或 Bug ID | 根因分析、修复方案、代码修改 | 提测与缺陷修复 |
 
 **一句话结论**：这三个 Skill 不是让 AI 随便写代码，而是把团队已有的目录结构、命名规范、分层方式和检查清单变成 AI 可执行的约束，让产出直接接近可提交状态，减少返工和 Review 轮次。
 
@@ -62,9 +68,24 @@ Skill（SKILL.md + references）
 
 它带来的不是单次写得更快，而是**同一类任务每次都能按同一标准完成**。
 
+当多个 Skill 需要按固定顺序协作时，再向上固化一层 Command：Skill 定义「每一步怎么做」，Command 定义「先做哪步、做到什么程度才进入下一步」。见 0.5 与 4.5。
+
 > AI 可以加速生成，但不能替代业务判断、代码审查和测试验证。效率提升必须建立在质量达标之上。
 
-### 0.5 前置条件
+### 0.5 两个 Command 一页速览
+
+Skill 是单点能力，Command 是把单点能力串成流水线的编排层。本项目提供两个命令：
+
+| Command | 解决什么问题 | 输入 | 主要产出 | 是否改代码 |
+|---|---|---|---|---|
+| `/android-feature` | 一个功能跨 UI、接口、上屏、审查四段，靠人记顺序容易漏阶段、漏规范 | 设计稿链接 + 接口文档链接 + 功能名，顺序任意；`-y` 跳过中途确认 | XML 与页面骨架、完整网络链路、数据上屏、审查报告 | 阶段一~三改代码，阶段四只审不改 |
+| `/android-review` | 审查只看正确性，不按项目规范逐条比对 | 无参默认审查未提交改动 + 当前分支 diff；也可指定文件、目录或提交 | 分级问题清单 + 最小修复方案 | 否 |
+
+- `/android-feature` 内部依次调用 `figma-android-ui`、`android-api-ds`，第四阶段复用 `/android-review` 的标准。
+- `/android-review` 可以脱离流水线单独使用，作为提交前的统一审查入口。
+- 命令的安装与验证见 3.6，完整用法与示例见 4.5。
+
+### 0.6 前置条件
 
 | 项目 | 要求 |
 |---|---|
@@ -120,6 +141,8 @@ Skill（SKILL.md + references）
         ↓
 安装三个 Skill
         ↓
+安装 Commands（/android-feature、/android-review）
+        ↓
 完成项目架构认知
         ↓
 按「页面 → 接口 → Bug」试点
@@ -134,6 +157,7 @@ Skill（SKILL.md + references）
 | 环境准备 | 0.5 天 | Node、Qoder、Android Studio 可用 |
 | 凭证与 MCP | 0.5 天 | 两个 MCP 显示「可用 / 已连接」 |
 | Skill 安装 | 10 分钟 | 三个 Skill 出现在技能列表 |
+| Commands 安装 | 5 分钟 | `/android-feature`、`/android-review` 出现在斜杠列表 |
 | 项目认知 | 0.5~1 天 | 模块职责、分层、资源归属说明 |
 | 试点 | 1 周 | 1 个页面、1 个接口、1 个 Bug 的完整记录 |
 | 推广 | 持续 | 团队使用规范与质量度量 |
@@ -145,18 +169,22 @@ Skill（SKILL.md + references）
 ```
 需求评审 → 设计 → UI 开发 → 接口联调 → 提测 → 缺陷修复 → 回归
                      │           │                    │
-                     │           │                    └── fix_tapd_android_bug
-                     │           └── android_api_ds
+                     │           │                    └── fix-tapd-android-bug
+                     │           └── android-api-ds
                      └── figma-android-ui
 ```
 
 | 链路环节 | Skill | 触发方式 | 人的角色 |
 |---|---|---|---|
 | UI 开发 | `figma-android-ui` | 提供设计稿链接或截图，说「生成页面 / 转 XML」 | 确认模块、走查还原度 |
-| 接口联调 | `android_api_ds` | 提供 Swagger/Knife4j 文档，说「对接接口 / 生成请求代码」 | 确认字段语义、业务分支 |
-| 缺陷修复 | `fix_tapd_android_bug` | 提供 TAPD 链接，说「修复这个 Bug」 | 确认根因、验收修复 |
+| 接口联调 | `android-api-ds` | 提供 Swagger/Knife4j 文档，说「对接接口 / 生成请求代码」 | 确认字段语义、业务分支 |
+| 缺陷修复 | `fix-tapd-android-bug` | 提供 TAPD 链接，说「修复这个 Bug」 | 确认根因、验收修复 |
+| 完整功能 | `figma-android-ui` → `android-api-ds` | `/android-feature <功能名> <设计稿链接> <接口文档链接>` | 确认边界、逐阶段验收 |
+| 提交前审查 | `android-api-ds` + `figma-android-ui` | `/android-review` | 处理问题、决定修复优先级 |
 
 三个 Skill 共用同一套项目规范（MVVM、组件化目录、命名规则），因此可以串起来使用。
+
+命令层在此之上做编排：`/android-feature` 把「UI 开发 → 接口联调 → 数据上屏 → 审查」固定成一条流水线，`/android-review` 则把同一套审查标准单独抽出，供提交前复用。
 
 ---
 
@@ -361,7 +389,7 @@ npx -y figma-developer-mcp --stdio
 
 ---
 
-## 3. 添加 Skill
+## 3. 添加 Skill 与 Command
 
 ### 3.1 安装位置
 
@@ -390,21 +418,20 @@ skills/
 │       ├── variable-naming.md
 │       ├── ...
 │       └── architecture-spec.md
-├── android_api_ds/
+├── android-api-ds/
 │   ├── SKILL.md
 │   ├── README.md
 │   └── references/
 │       ├── naming-spec.md
 │       └── code-templates.md
-└── fix_tapd_android_bug/
+└── fix-tapd-android-bug/
     └── SKILL.md
 ```
 
 要求：
 
 - 每个 Skill 必须有 `SKILL.md`。
-- `SKILL.md` 的 frontmatter `name` 建议与文件夹名一致。
-- `android_api_ds` 的 frontmatter 已改为 `name: android_api_ds`，不要改回旧名称。
+- 文件夹名、`SKILL.md` 的 frontmatter `name`、Command 中的引用三者保持一致：`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug`。
 - `references/` 中的规范文件保持单一职责，不要把命名、布局、代码风格混在一个文件里。
 
 ### 3.3 安装与加载
@@ -412,7 +439,7 @@ skills/
 **方式一：手动复制**
 
 ```text
-把 figma-android-ui、android_api_ds、fix_tapd_android_bug 三个文件夹
+把 figma-android-ui、android-api-ds、fix-tapd-android-bug 三个文件夹
 复制到 C:\Users\<用户名>\.qoder-cn\skills\
 ```
 
@@ -440,8 +467,8 @@ skills/
 验证方式：
 
 1. 三个 Skill 都出现在列表中。
-2. 输入触发语句，例如「根据这个 Swagger 文档生成网络请求代码」，Qoder 能识别并调用 `android_api_ds`。
-3. 如果没识别，检查文件夹层级是否多套了一层，例如 `skills/android_api_ds/android_api_ds/SKILL.md` 是错误结构。
+2. 输入触发语句，例如「根据这个 Swagger 文档生成网络请求代码」，Qoder 能识别并调用 `android-api-ds`。
+3. 如果没识别，检查文件夹层级是否多套了一层，例如 `skills/android-api-ds/android-api-ds/SKILL.md` 是错误结构。
 
 ### 3.5 Skill 与项目的适配
 
@@ -449,8 +476,8 @@ skills/
 
 | 文件 | 需要确认的内容 |
 |---|---|
-| `android_api_ds/references/code-templates.md` | 基类名、包名、响应封装、DataSource 基类 |
-| `android_api_ds/references/naming-spec.md` | 实体、Service、DS、VM 的命名 |
+| `android-api-ds/references/code-templates.md` | 基类名、包名、响应封装、DataSource 基类 |
+| `android-api-ds/references/naming-spec.md` | 实体、Service、DS、VM 的命名 |
 | `figma-android-ui/references/package-naming.md` | 项目的模块名和包名 |
 | `figma-android-ui/references/architecture-spec.md` | 模块依赖、DI、路由、事件总线 |
 | `figma-android-ui/references/color-naming.md` | 颜色是否统一放在 `lib_common` |
@@ -466,9 +493,42 @@ skills/
 - 每次项目迭代后，把新出现的反例补充进检查清单。
 - 团队内指定维护人，避免 Skill 与工程实际逐渐脱节。
 
+### 3.6 安装 Command
+
+Command 是 commands 目录下的一份 Markdown 文件，**文件名即命令名**。安装级别与 Skill 一致：
+
+| 级别 | 路径 | 适用场景 |
+|---|---|---|
+| 用户级 | `C:\Users\<用户名>\.qoder-cn\commands\` | 个人使用，所有项目可调用 |
+| 项目级 | `<项目根目录>\.qoder\commands\` | 团队共享，跟随仓库版本管理 |
+
+把仓库中的两个命令文件复制进去：
+
+```
+commands/
+├── android-feature.md     # 调用名：/android-feature
+└── android-review.md      # 调用名：/android-review
+```
+
+要求：
+
+- 文件名使用 kebab-case，与调用名一致：`android-feature.md` → `/android-feature`。
+- frontmatter 只写 `description`，用于斜杠列表中的说明。
+- 命令正文里引用的 Skill 路径必须是本机真实存在的路径；项目级安装时，路径改成团队约定的位置。
+- Command 依赖 3.1~3.3 节安装的三个 Skill，先装 Skill 再装 Command。
+
+**加载与验证**
+
+1. 重新打开客户端，或在对话输入 `/`，列表中应出现 `android-feature` 和 `android-review`。
+2. 输入 `/android-feature` 不带参数，应一次性问齐设计稿链接、接口文档链接和功能名，而不是报错。
+3. 输入 `/android-review`，应先读取 diff，再输出「概览 → 问题表 → 修复方案」。
+4. 看不到命令时，确认文件在 `commands` 目录、扩展名是 `.md`，再重开客户端或重启 IDE。
+
+> 命令与 Skill 不要混放：Skill 进 `skills/`，Command 进 `commands/`。放错目录时，两边都不会出现在列表里。
+
 ---
 
-## 4. 三个 Skill 的落地
+## 4. 三个 Skill 与两个 Command 的落地
 
 ### 4.0 落地前统一动作：项目认知
 
@@ -621,7 +681,7 @@ skills/
 | 颜色 | `color_XXXXXX`，十六进制字母大写；禁止语义化命名；统一放在 `lib_common/colors.xml` |
 | 控件 ID | `m` + 类型缩写 + 驼峰，如 `mTvTitle`、`mIvBack`、`mEtPhone`、`mRvList` |
 | 布局文件 | 必须带类型前缀：`activity_`、`fragment_`、`dlg_`、`rv_*_cell`、`act_*_header` |
-| 嵌套 | 优先一层 ConstraintLayout 完成；最大 2 层；禁止 ConstraintLayout 嵌套任何布局容器 |
+| 嵌套 | ConstraintLayout 必须保持单层；禁止 ConstraintLayout 嵌套 ConstraintLayout（含 include/merge/自定义控件）；非 ConstraintLayout 容器总层级不超过 2 层 |
 | 属性顺序 | ID → 尺寸 → 约束 → 边距 → 外观 → 内容 → 行为 → tools |
 | 图片 | 从设计稿导出 3x PNG，放 `mipmap-xxhdpi`，文件名去掉 `@3x` |
 | 资源复用 | 新建 shape/颜色/图片前先查 `lib_common`，已有则直接引用 |
@@ -643,7 +703,7 @@ lib_common/src/main/res/drawable/shape_white_radius_12.xml（仅缺失时新增�
 - [ ] 文字大小也使用 `@dimen/dp_*`，没有使用 sp。
 - [ ] 控件 ID 符合 `mTv`、`mIv`、`mEt`、`mRv` 等规范。
 - [ ] 颜色使用 `@color/color_XXXXXX`，没有硬编码色值。
-- [ ] 布局优先一层 ConstraintLayout，嵌套不超过 2 层。
+- [ ] ConstraintLayout 保持单层，没有 ConstraintLayout 嵌套 ConstraintLayout。
 - [ ] 新资源先查 `lib_common`，没有重复创建。
 - [ ] 图片为 3x PNG，放在 `mipmap-xxhdpi`。
 - [ ] 没有手写 Vector Drawable。
@@ -651,7 +711,7 @@ lib_common/src/main/res/drawable/shape_white_radius_12.xml（仅缺失时新增�
 
 ---
 
-### 4.2 android_api_ds：接口文档转网络链路
+### 4.2 android-api-ds：接口文档转网络链路
 
 **适用场景**
 
@@ -777,7 +837,7 @@ Skill 不绑定某一个工程，首次使用会确认项目根目录、网络�
 
 ---
 
-### 4.3 fix_tapd_android_bug：缺陷单转修复
+### 4.3 fix-tapd-android-bug：缺陷单转修复
 
 **适用场景**
 
@@ -891,27 +951,124 @@ Bug 描述与评论矛盾时，**以评论中的技术结论为准**。
 设计稿
   ↓ figma-android-ui
 XML 布局 + Activity/Fragment 骨架
-  ↓ android_api_ds
+  ↓ android-api-ds
 Req / Data / Api / Service / DS / VM / Factory / InjectorUtils
   ↓ 联调与提测
 TAPD Bug
-  ↓ fix_tapd_android_bug
+  ↓ fix-tapd-android-bug
 根因分析 + 修复 + 回归
 ```
 
 三个 Skill 共用同一套项目规范，因此可以连续使用。每次切换任务时，重新确认模块、页面和接口边界。
 
-### 4.5 提升了哪些方面的开发效率
+这套人工串联可以固化成 `/android-feature`：命令负责阶段顺序、交接门禁和停止点，规范仍由三个 Skill 提供。用法见 4.5。
+
+---
+
+### 4.5 用 Commands 把 Skill 串成流水线
+
+Skill 一次只解决「页面」「接口」或「Bug」。真实需求常常是「新页面 + 新接口 + 数据上屏 + 提交审查」，需要连续调用多个 Skill，并在每次切换时重新交代规范。Commands 把顺序、门禁和停止点写进一条斜杠命令，避免漏阶段、漏规范、漏确认。
+
+| Command | 解决的问题 | 与 Skill 的关系 |
+|---|---|---|
+| `/android-feature` | 一个功能跨四个阶段，靠人记住顺序和交接 | 阶段一调用 `figma-android-ui`，阶段二调用 `android-api-ds`，阶段四复用 `/android-review` 的标准 |
+| `/android-review` | 审查只看代码正确性，不逐条比对项目规范 | 网络链路按 `android-api-ds`，UI 与资源按 `figma-android-ui` |
+
+**分层关系**
+
+```
+Command（编排：顺序 + 门禁 + 停止点）
+   ├── Skill（规范与模板：figma-android-ui / android-api-ds / fix-tapd-android-bug）
+   └── MCP（数据通道：Figma 设计稿、Swagger 文档、TAPD Bug）
+```
+
+Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 references 和项目现有代码为准。
+
+**/android-feature 的四个阶段**
+
+| 阶段 | 动作 | 是否改代码 | 阶段产出 |
+|---|---|---|---|
+| 一、UI | 读 Figma 节点，生成 XML 与 Activity/Fragment 骨架，导出 3x 图 | 是 | 文件清单 + 自检结果 + 与设计稿的已知偏差 |
+| 二、接口链路 | 生成 Req/Data/Api/ApiService/IDS/DS/VM/Factory，补 InjectorUtils | 是 | 文件清单 + 文档字段映射表 + 对文档未明确处的假设 |
+| 三、数据上屏 | DS → VM → LiveData → UI，打通加载/有数据/空/失败四态 | 是 | 数据流说明 + 改动文件清单 |
+| 四、审查 | 按 `/android-review` 标准审查本次全部改动 | 否 | 概览 + 问题表 + 最小修复方案 |
+
+- 四阶段是依赖顺序，不可跳、不可乱序；每阶段自检通过才进入下一阶段。
+- 未加 `-y` 时，阶段一和阶段二结束后会停下等确认；加 `-y` 会连续跑完，但仍输出每阶段门禁摘要。
+- 阶段一不写网络代码，列表用静态占位或空 Adapter；接口就绪后在阶段三替换，不允许用假数据冒充真实上屏。
+- 阶段四只出报告不改代码；确认后才按 P0/P1/P2 修复，且只改本次范围内的代码。
+
+**输入解析规则**
+
+`/android-feature` 不要求固定格式，按内容识别，顺序任意：
+
+| 参数 | 识别方式 | 示例 |
+|---|---|---|
+| 设计稿链接 | 域名含 `figma.com` / `mastergo.com` / `js.design` / `lanhuapp.com` | `https://www.figma.com/design/xxx` |
+| 接口文档链接 | 含 `swagger` / `doc.html` / `knife4j` | `https://api.xxx.com/doc.html#/login` |
+| 功能名 | 其余第一段非链接文本 | `登录页` |
+| `-y` | 跳过中途确认，一次跑完 | 放在参数任意位置 |
+
+- 当前对话中已出现的链接会被直接复用。
+- 仍缺失的信息会一次性问全，不会多轮追问。
+- 工程根目录就是当前工作区；没有 `settings.gradle(.kts)` 时会停下让你切换工作区，不会新建工程或目录。
+- 模块、包名、网络模块位置从代码推断，推断不出才问。
+
+**调用示例**
+
+```text
+# 完整功能，按阶段停下确认
+/android-feature 登录页 https://www.figma.com/design/xxx https://api.xxx.com/doc.html#/login
+
+# 参数顺序任意；只给设计稿时，命令会一次性问齐接口文档
+/android-feature https://www.figma.com/design/xxx 登录页
+
+# 试点校准后可连续跑完；仍输出每阶段门禁
+/android-feature 订单详情 https://www.figma.com/design/xxx https://api.xxx.com/doc.html#/order -y
+
+# 单独审查提交前改动
+/android-review
+
+# 只审查指定文件或目录
+/android-review module_order/src/main/java/.../view/activity/OrderDetailActivity.kt
+```
+
+**什么时候用 Command，什么时候直接用 Skill**
+
+| 场景 | 推荐方式 |
+|---|---|
+| 新页面 + 新接口的完整功能 | `/android-feature` |
+| 已有页面改版，只动 UI | 直接触发 `figma-android-ui` |
+| 只补一个接口 | 直接触发 `android-api-ds` |
+| 只修 Bug | 直接触发 `fix-tapd-android-bug` |
+| 提交前统一审查 | `/android-review` |
+| 规范未适配、首次试点 | 人工逐步执行，不加 `-y` |
+| 需求未定稿、跨模块大重构 | 拆解后逐步执行，不要一条命令跑完 |
+
+> `-y` 只省略人工确认，不降低门禁。Skill 未适配、需求边界不清、涉及支付/权限/隐私时，不要加 `-y`。
+
+**命令的硬性约束**
+
+- UI 未定稿不写接口绑定；接口未就绪不得用硬编码假数据冒充真实上屏。
+- 设计稿与接口冲突（字段缺失、交互无法实现）时立即提出并给可选方案，不自行折中。
+- 每阶段结束必须给出「已完成 / 待确认 / 下一步」，不静默推进、不跨阶段返工。
+- 规范类结论必须能指到 Skill 的具体文件与规则，不臆造。
+- 不修改无关代码，不新增未使用的依赖、工具类或抽象层。
+
+---
+
+### 4.6 提升了哪些方面的开发效率
 
 > 以下效率提升均以「通过质量门禁」为前提，不包含返工和缺陷修复的成本。
 
-| 方面 | 传统方式 | 使用 Skill 后 | 提效原因 |
+| 方面 | 传统方式 | 使用 Skill / Command 后 | 提效原因 |
 |---|---|---|---|
 | 样板代码 | 手写实体、Service、DS、VM、Factory | 一次生成完整链路 | 机械劳动交给模板 |
 | 规范一致性 | 靠记忆和 Review 兜底 | 规范前置到生成阶段 | 命名、目录、资源位置一次到位 |
 | 跨系统信息获取 | 在 Figma、Swagger、TAPD 间切换 | 一个链接直接读取 | MCP 直连，减少搬运 |
 | 问题定位 | 靠经验翻描述和评论 | 评论优先 + 根因分类 | 上下文聚合，路径固定 |
 | Code Review | 多轮修命名、修资源、修分层 | 首轮问题减少 | 检查清单内置 |
+| 阶段交接 | 人记四阶段、逐次触发、重复交代规范 | `/android-feature` 按序执行并输出门禁 | 顺序、停止点、交付物固化 |
 | 新人上手 | 读文档、问老人、照旧代码模仿 | 看 Skill 就能按标准产出 | 规范从文档变成可执行指令 |
 
 **预估对比**
@@ -939,6 +1096,15 @@ TAPD Bug
 
 ## 5. 标准作业流程（SOP）
 
+**两种执行方式**
+
+| 方式 | 适用场景 | 操作 |
+|---|---|---|
+| 人工逐步 | 首次试点、Skill 未适配、需求边界不清、涉及支付/权限/隐私 | 按 4.1~4.3 逐个触发 Skill，每步人工确认 |
+| 命令编排 | Skill 已适配、需求边界清晰、按页面/接口拆分 | `/android-feature` 一次跑完四阶段；`/android-review` 单独复审 |
+
+两种方式共用同一套步骤和门禁，命令只是把 3~5 步的顺序与交接固化下来，不跳过编译、自测和 Review。
+
 | 步骤 | 动作 | 责任人 | 产出 |
 |---|---|---|---|
 | 1 | 完成项目认知，确认模块职责和文件落点 | 开发者 | 架构理解摘要 |
@@ -950,6 +1116,16 @@ TAPD Bug
 | 7 | 按验收清单逐项确认 | 开发者 | 验收结论 |
 | 8 | 提交 PR，Reviewer 按普通代码标准审查 | 开发者 + Reviewer | 合并结论 |
 | 9 | 提测，测试按业务场景回归 | 测试 | 测试结论 |
+
+**命令与 SOP 的对应关系**
+
+| 步骤 | 命令方式 |
+|---|---|
+| 1~2 | 命令启动时确认工程根目录与模块归属；分支和工作区仍由人保证 |
+| 3~4 | `/android-feature <功能名> <设计稿链接> <接口文档链接>` |
+| 5 | 每阶段结束时输出文件清单、自检结果和「待确认」项 |
+| 6~7 | 命令内置阶段自检；提交前再跑 `/android-review` |
+| 8 | Reviewer 用 `/android-review` 得到统一口径的问题清单 |
 
 **任务粒度**
 
@@ -1009,6 +1185,8 @@ TAPD Bug
 
 > 验收结论只有两种：**通过**或**打回**，不存在「先合并再补」。
 
+命令执行时，门禁由命令在各阶段尾部输出，但**验收责任仍归开发者**：`-y` 只是取消人工停顿，不会跳过编译、自测、`/android-review` 和 PR Review。
+
 ### 6.4 建议度量指标
 
 | 指标 | 采集方式 |
@@ -1018,6 +1196,7 @@ TAPD Bug
 | 首次自测通过率 | 生成后首次自测通过的需求比例 |
 | Code Review 轮次 | 统计 PR 评论轮数 |
 | 命名/资源类问题数 | Review 问题分类计数 |
+| 命令一次跑通率 | `/android-feature` 过程中无需人工纠正阶段顺序或规范的比例 |
 | 返工率 | 因规范或遗漏导致的二次修改比例 |
 | 线上缺陷数 | AI 参与需求上线后的 P0/P1 缺陷 |
 
@@ -1038,6 +1217,9 @@ TAPD Bug
 | 规范漂移 | 工程改了基类，Skill 未更新 | 把 Skill 纳入工程规范维护范围 |
 | 一次生成范围过大 | 文件冲突、遗漏、难以审查 | 按页面、接口、Bug 拆分任务 |
 | 误用不匹配的架构 | Hilt/Compose 项目套用旧模板 | 先适配 references，再使用 |
+| 用 `-y` 跳过交接 | 阶段没自检就进入下一阶段，问题被后移 | 试点期不加 `-y`；只在 Skill 校准后对低风险功能使用 |
+| 命令与 Skill 脱节 | Command 引用的 Skill 路径或名称变更，命令仍在跑旧流程 | 命令和 Skill 同仓库维护，改目录或名称时同步更新命令正文 |
+| 一条命令跑太大范围 | 一个功能塞多个页面、多个模块，diff 无法审查 | 命令只按单页面/单接口粒度使用，超出则拆分任务 |
 
 需要明确：Skill 产出的是**符合团队规范的第一版代码**，不是最终业务实现。业务规则、边界条件、产品意图仍然需要人来判断。**质量责任始终在人，不在工具。**
 
@@ -1061,7 +1243,7 @@ TAPD Bug
 | 现象 | 可能原因 | 处理 |
 |---|---|---|
 | 技能列表看不到 | 目录层级错误、缺少 `SKILL.md` | 检查 `skills/<name>/SKILL.md`，执行 `/skills reload` |
-| 名称不对 | 文件夹名与 frontmatter `name` 不一致 | 统一为 `android_api_ds` 等名称 |
+| 名称不对 | 文件夹名与 frontmatter `name` 不一致 | 统一为 `android-api-ds` 等名称 |
 | 触发了但没有工具 | MCP 未启用 | 在桌面端或 IDE 中打开连接器开关 |
 | 生成代码不符合项目 | references 未适配 | 更新基类、包名、响应封装等配置 |
 | 生成结果放错模块 | 未做项目认知 | 先读架构文档，再指定模块和目录 |
@@ -1073,7 +1255,7 @@ TAPD Bug
 | 文件重复创建 | 模块已有同类文件 | 要求追加而不是覆盖 |
 | 颜色/资源重复 | 未检查 `lib_common` | 生成前明确要求先查重 |
 | 图片尺寸不对 | 设计稿不是 3x 或导出倍率错误 | 重新导出 3x PNG |
-| 布局层级过深 | 设计结构复杂 | 要求扁平化 ConstraintLayout，嵌套不超过 2 层 |
+| 布局层级过深 | 设计结构复杂 | 要求扁平化 ConstraintLayout，禁止 ConstraintLayout 嵌套 ConstraintLayout |
 | Bug 修复范围过大 | 未限制改动范围 | 明确最小改动原则，只改必要代码 |
 
 ### 8.4 图片无法显示
@@ -1081,7 +1263,7 @@ TAPD Bug
 本文档中的图片使用相对路径 `images/xxx.png`。请保持 Markdown 文件与 `images` 目录在同一级：
 
 ```
-victor/skill/
+<文档目录>/
 ├── Qoder-Code-Android-落地文档.md
 └── images/
     ├── figma_1.png
@@ -1090,6 +1272,18 @@ victor/skill/
 ```
 
 如果移动了文档，需要同步调整图片路径。
+
+### 8.5 Commands 相关
+
+| 现象 | 可能原因 | 处理 |
+|---|---|---|
+| 输入 `/` 看不到命令 | 文件不在 commands 目录、扩展名不是 `.md`、客户端未重载 | 放到 `~/.qoder-cn/commands/` 或 `.qoder/commands/`，重开客户端或重启 IDE |
+| 命令名与预期不同 | 文件名即命令名 | 文件名改成 `android-feature.md`，调用 `/android-feature` |
+| 命令执行但不按规范 | Skill 未安装，或命令中引用的 Skill 路径不存在 | 先完成第 3 节安装；核对命令正文里的路径与本机一致 |
+| 参数被识别错 | 链接域名不在识别列表，或文本与链接混排 | 显式写「设计稿：<链接>」「接口文档：<链接>」「功能名：<名称>」 |
+| 想每阶段确认却一路跑完 | 输入了 `-y` | 去掉 `-y`；或在任务开始时说明「每阶段停下等我确认」 |
+| 命令只跑了 UI 就结束 | 未提供接口文档，或接口未定稿 | 补齐接口文档；按 4.5 的「什么时候用命令」改为单点 Skill |
+| 命令与项目级 Skill 冲突 | 项目级和用户级同名 Skill 并存 | 只保留一处；团队规范统一用项目级 |
 
 ---
 
@@ -1101,6 +1295,7 @@ victor/skill/
 4. **敏感模块人工 Review**：支付、认证、隐私、权限相关代码必须由模块负责人审查。
 5. **截图脱敏**：分享配置截图时，遮挡 token、workspace ID、Bug ID、项目路径中的敏感信息。
 6. **代码审查不豁免**：AI 生成的代码按普通代码标准审查，不能因为「是 AI 写的」而降低要求。
+7. **谨慎使用 `-y`**：命令连续执行会在无人确认的情况下改多个文件；支付、认证、隐私、权限相关模块禁止使用 `-y`，并保持小粒度提交便于回滚。
 
 ---
 
@@ -1110,10 +1305,10 @@ victor/skill/
 
 | 阶段 | 时间 | 动作 | 产出 |
 |---|---|---|---|
-| 准备期 | 1 天 | 安装 Skill、配置 Figma/TAPD MCP、阅读项目架构与模块文档、输出架构理解摘要、选定试点工程 | 可运行环境 + 项目认知摘要 |
-| 试点期 | 1 周 | 各选 1 个页面、1 个接口、1 个 Bug | 基线耗时、生成 diff、问题清单 |
-| 校准期 | 1 周 | 调整 references、基类映射、目录约定 | 适配团队工程的 Skill 版本 |
-| 推广期 | 持续 | 团队使用、纳入 PR 检查、每月复盘 | 使用规范与度量报表 |
+| 准备期 | 1 天 | 安装 Skill 与 Commands、配置 Figma/TAPD MCP、阅读项目架构与模块文档、输出架构理解摘要、选定试点工程 | 可运行环境 + 项目认知摘要 |
+| 试点期 | 1 周 | 各选 1 个页面、1 个接口、1 个 Bug；先用单点 Skill，再加 `-y` 试跑 `/android-feature` | 基线耗时、生成 diff、问题清单 |
+| 校准期 | 1 周 | 调整 references、基类映射、目录约定；同步命令正文中的 Skill 路径与阶段门禁 | 适配团队工程的 Skill 与 Command 版本 |
+| 推广期 | 持续 | 团队使用、纳入 PR 检查（提交前 `/android-review`）、每月复盘 | 使用规范与度量报表 |
 
 ### 10.2 建议度量指标
 
@@ -1127,11 +1322,11 @@ victor/skill/
 
 ### 10.3 推广建议
 
-- 先由 1~2 名开发者试点，形成可复制的提问模板。
-- 新成员进入项目后，先完成项目认知再使用 Skill，不要跳过文档阅读。
-- 把「生成后验收清单」放进 PR 模板。
-- 每月收集一次反例，更新 Skill，而不是只在群里口头提醒。
-- 后续可以把测试用例生成、发布说明、埋点检查等重复工作也沉淀为 Skill。
+- 先由 1~2 名开发者试点，形成可复制的提问模板和标准命令调用格式。
+- 新成员进入项目后，先完成项目认知再使用 Skill 或 Command，不要跳过文档阅读。
+- 把「生成后验收清单」放进 PR 模板，并规定提交前执行 `/android-review`。
+- 每月收集一次反例，更新 Skill 与 Command，而不是只在群里口头提醒。
+- 后续可以把测试用例生成、发布说明、埋点检查等重复工作也沉淀为 Skill，再把它们串进新的 Command。
 
 ---
 
@@ -1161,6 +1356,8 @@ victor/skill/
 ```
 
 ### 11.2 常用 Prompt 汇总
+
+以下 Prompt 适合单点使用（只做 UI、只做接口、只修 Bug）。完整功能优先用 `/android-feature`，命令速查见 11.7。
 
 **项目认知**
 
@@ -1330,7 +1527,7 @@ module_*/src/main/res/
 - 750px / 3x，px 与 dp 1:1，文字也用 dp。
 - 颜色 `color_XXXXXX`，字母大写，禁止语义化命名。
 - 控件 ID：`m` + 类型缩写 + 驼峰。
-- 布局一层 ConstraintLayout 优先，最多 2 层。
+- 布局保持单层 ConstraintLayout，禁止 ConstraintLayout 嵌套 ConstraintLayout。
 - 图片 3x PNG，放 `mipmap-xxhdpi`，不手写 Vector。
 
 接口接入：
@@ -1347,23 +1544,32 @@ module_*/src/main/res/
 - 最小改动，不顺手重构。
 - 文案改动必须全量搜索 XML、strings、代码硬编码和多语言。
 
+命令使用：
+
+- `/android-feature` 一次只跑一个功能，不跨模块、不批量。
+- 阶段顺序不可跳；审查阶段只审不改，确认后才按 P0/P1/P2 修复。
+- Skill 未校准、需求未定稿、支付/权限/隐私模块不加 `-y`。
+
 ### 11.4 上线前检查表
 
 - [ ] 两个 MCP 在桌面端和 IDE 插件中均显示可用 / 已连接。
 - [ ] 三个 Skill 在技能列表中可见，触发语句能识别。
+- [ ] `/android-feature`、`/android-review` 在斜杠列表中可见，且命令正文中的 Skill 路径正确。
 - [ ] 项目认知摘要已确认，模块职责和文件落点明确。
 - [ ] 试点页面、接口、Bug 各完成一次完整流程。
 - [ ] 质量门禁和验收清单已纳入 PR 模板。
 - [ ] 含 token 的配置文件未提交到仓库。
-- [ ] 团队已明确 Skill 维护人和更新流程。
+- [ ] 团队已明确 Skill 与 Command 的维护人和更新流程。
 
 ### 11.5 速查表
 
 | 场景 | 一句话触发 | 主要产出 |
 |---|---|---|
+| 完整功能 | `/android-feature <功能名> <设计稿链接> <接口文档链接>` | UI + 网络链路 + 数据上屏 + 审查 |
 | 设计还原 | 「根据这个 Figma 链接生成 XX 页面」 | XML + Activity/Fragment + 资源清单 |
 | 接口接入 | 「根据这个 Swagger 生成 XX 模块 XX 动作的网络链路」 | 9 个落点的完整链路 |
 | 缺陷修复 | 「修复这个 TAPD Bug：链接」 | 根因 + 方案 + 代码改动 |
+| 提交前审查 | `/android-review` | 概览 + 分级问题表 + 最小修复方案 |
 | 规范查询 | 「按项目规范检查这个布局」 | 命名、资源、嵌套、属性顺序问题清单 |
 
 **使用前记住四件事**
@@ -1375,11 +1581,32 @@ module_*/src/main/res/
 
 ### 11.6 5 分钟分享提纲
 
-1. **30 秒结论**：三个 Skill 覆盖 UI 开发、接口联调、缺陷修复，把团队规范变成可执行指令。
-2. **1 分钟全景**：设计稿 → XML，接口文档 → 网络链路，TAPD → 修复方案。
-3. **2 分钟演示**：选一个接口接入，展示 9 个文件的生成过程和依赖链路。
+1. **30 秒结论**：三个 Skill 覆盖 UI 开发、接口联调、缺陷修复，`/android-feature` 把它们串成一条流水线，把团队规范变成可执行指令。
+2. **1 分钟全景**：设计稿 → XML，接口文档 → 网络链路，TAPD → 修复方案；命令负责顺序与门禁。
+3. **2 分钟演示**：跑一次 `/android-feature`，展示四个阶段、9 个文件的生成过程和 `/android-review` 的审查报告。
 4. **1 分钟收益与前提**：提效来自减少样板代码、减少信息搬运、减少规范返工；但质量是前提，未通过编译、自测和 Review 的生成结果不计入效率收益。使用前还要先读懂项目架构与模块文档。
-5. **30 秒落地**：先试点三个任务，记录基线，再校准 Skill，最后团队推广。
+5. **30 秒落地**：先装 Skill 再装 Command，试点三个任务并记录基线，校准后再团队推广。
+
+### 11.7 Commands 速查
+
+| 命令 | 用途 | 说明 |
+|---|---|---|
+| `/android-feature <功能名> <设计稿链接> <接口文档链接>` | 一次交付完整功能 | 参数顺序任意；阶段一、二后停下确认 |
+| `/android-feature ... -y` | 连续跑完四阶段 | 仍输出每阶段门禁；不要用于敏感模块 |
+| `/android-review` | 审查未提交改动 + 分支 diff | 只审不改，问题分级输出 |
+| `/android-review <文件或目录>` | 审查指定范围 | 以指定范围为准 |
+| `/android-review <提交>` | 审查指定提交 | 以指定提交为准 |
+
+**最短上手路径**
+
+```text
+1. 装 Skill（第 3 节）→ /skills list 确认三个 Skill
+2. 装 Command（3.6）→ 输入 / 确认两个命令
+3. 项目认知（4.0）→ 确认模块与落点
+4. 单点试点（4.1~4.3）→ 校准 references
+5. 完整功能（4.5）→ /android-feature ... -y
+6. 提交前（4.5）→ /android-review
+```
 
 ---
 
@@ -1389,3 +1616,4 @@ module_*/src/main/res/
 |---|---|---|
 | v1.0 | 2026-11-06 | 初始版本：MCP 配置、Skill 安装、三个 Skill 落地、质量门禁与排查 |
 | v1.1 | 2026-11-06 | 合并技术分享内容：Skill 定位与效率分析、规范与元素映射、边界风险、落地路线、速查表与分享提纲 |
+| v1.2 | 2026-11-11 | 新增 Commands：安装与验证、`/android-feature` 四阶段流水线、`/android-review` 双规范审查、输入解析与 `-y` 门禁、故障排查与速查；统一 Skill 命名为 `android-api-ds` / `fix-tapd-android-bug` |

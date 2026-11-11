@@ -60,21 +60,35 @@ xmlns:tools="http://schemas.android.com/tools"               <!-- 第3位 -->
 
 ## 布局嵌套规则
 
+> **硬性规则：禁止 ConstraintLayout 嵌套 ConstraintLayout。** 该规则无例外，优先级高于“最大 2 层”等层级限制，`<include>`、`<merge>` 和自定义组合控件同样适用。
+
 ### 核心原则
 
-**尽量使用 ConstraintLayout 一层布局完成所有布局需求**，禁止同类布局嵌套，禁止 ConstraintLayout 嵌套其他布局容器。
+**ConstraintLayout 必须保持单层**：父节点是 ConstraintLayout 时，子节点不能再是 ConstraintLayout。需要分组、分区或流式排列时，用约束和辅助组件扁平化，不要新增 ConstraintLayout 子布局。
 
 ### 禁止的嵌套组合
 
 | 禁止规则 | 说明 |
 |----------|------|
-| ConstraintLayout 嵌套 ConstraintLayout | 同类禁止 |
+| ConstraintLayout 嵌套 ConstraintLayout | 绝对禁止，无例外（含 include、merge、自定义控件） |
 | ConstraintLayout 嵌套 LinearLayout | 禁止，用约束替代 |
 | ConstraintLayout 嵌套 RelativeLayout | 禁止，用约束替代 |
 | ConstraintLayout 嵌套 FrameLayout | 禁止，用约束替代 |
 | LinearLayout 嵌套 LinearLayout | 同类禁止 |
 | RelativeLayout 嵌套 RelativeLayout | 同类禁止 |
 | FrameLayout 嵌套 FrameLayout | 同类禁止 |
+
+### ConstraintLayout 扁平化替代方案
+
+| 需求 | 替代方案 |
+|------|----------|
+| 划分区域/对齐基准 | `Guideline`、`Barrier` |
+| 等分或链式排列 | `Chain` |
+| 流式换行 | `Flow` |
+| 批量控制显隐 | `Group` / `ConstraintHelper` |
+| 占位/间距 | `Space` |
+| 复杂子块 | 拆成独立布局文件；如果根节点是 ConstraintLayout，只能作为页面/Fragment 根或放入非 ConstraintLayout 容器 |
+| 列表项/弹窗 | 使用独立 `rv_*_cell.xml` / `dlg_*.xml`，根节点可以是 ConstraintLayout，但不能再嵌入 ConstraintLayout |
 
 ### ConstraintLayout 嵌套 ConstraintLayout（禁止）
 
@@ -163,7 +177,7 @@ xmlns:tools="http://schemas.android.com/tools"               <!-- 第3位 -->
 
 ### 允许的嵌套组合
 
-仅在以下特殊场景允许嵌套，且外层**不能是 ConstraintLayout**：
+仅在以下特殊场景允许非 ConstraintLayout 容器嵌套；无论哪种组合，外层都**不能是 ConstraintLayout**：
 
 | 外层布局 | 可嵌套 | 适用场景 |
 |----------|--------|----------|
@@ -171,20 +185,27 @@ xmlns:tools="http://schemas.android.com/tools"               <!-- 第3位 -->
 | FrameLayout | RecyclerView / ViewPager / 单个控件 | 层叠替换场景 |
 | RelativeLayout | RecyclerView / ScrollView | 兼容旧布局 |
 
+### include / merge 注意事项
+
+- 被 `<include>` 的布局根节点如果是 ConstraintLayout，不能再放进 ConstraintLayout 父布局。
+- `<merge>` 内的 ConstraintLayout 同样受限制；解析后的父子关系仍然算嵌套。
+- 自定义组合控件如果继承 ConstraintLayout，放进 ConstraintLayout 父布局也视为嵌套，必须改用普通控件或非 ConstraintLayout 容器。
+
 ### 嵌套层级限制
 
-- 最大嵌套层级：**2 层**（含根布局）
-- 推荐：**1 层 ConstraintLayout** 完成全部布局
-- 超过 2 层必须重构
+- ConstraintLayout 方案：**必须 1 层**，禁止再嵌套任何 ConstraintLayout。
+- 非 ConstraintLayout 容器：总层级最多 2 层。
+- 超过限制必须重构；优先用 Guideline / Barrier / Flow / Chain 扁平化。
+- “最大 2 层”不能作为 ConstraintLayout 嵌套 ConstraintLayout 的依据。
 
 ### 布局选择优先级
 
 ```
-1. ConstraintLayout（首选，一层完成）
+1. ConstraintLayout（首选，单层完成；禁止再嵌套 ConstraintLayout）
        ↓ 无法实现时
 2. LinearLayout / FrameLayout（仅用于列表、滚动等特殊容器）
        ↓ 禁止再嵌套
-3. 使用 <include> 复用子布局
+3. 使用 <include> 复用子布局（子布局根节点不能是 ConstraintLayout）
 ```
 
 ## 尺寸规范
@@ -322,10 +343,12 @@ app:strokeColor="@color/color_0084FF"
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 ```
 
+> 说明：Toolbar 内部的 ConstraintLayout 属于控件内部实现；页面内容区的 ConstraintLayout 与 Toolbar 位于不同分支。二者都不是 ConstraintLayout 嵌套，但不要在内容区 ConstraintLayout 内再套 ConstraintLayout。
+
 ## include 使用规范
 
 ```xml
-<!-- 头部子布局引用 -->
+<!-- 头部子布局引用；act_pay_way_header 的根节点不能是 ConstraintLayout -->
 <include
     android:id="@+id/includeHeader"
     layout="@layout/act_pay_way_header"
@@ -364,3 +387,13 @@ tools:listitem="@layout/rv_message_cell"
 - 不使用 Tab
 - 每个属性独占一行
 - 自闭合标签使用 `/>` 结尾
+
+## 生成后自检
+
+输出 XML 前逐项检查：
+
+1. 搜索所有 `ConstraintLayout` 开始标签，确认没有任何一个的直接父节点也是 `ConstraintLayout`。可用 XPath 快速检查：`//androidx.constraintlayout.widget.ConstraintLayout//androidx.constraintlayout.widget.ConstraintLayout`，结果必须为空。
+2. 检查 `<include>` 和 `<merge>` 引入的布局，确认没有间接嵌套。
+3. 检查自定义组合控件，确认没有在 ConstraintLayout 父布局中再引入 ConstraintLayout 实现。
+4. 发现嵌套时，必须用 Guideline / Barrier / Flow / Chain / Group 扁平化，或拆成独立布局文件后重新输出。
+5. 不允许以“嵌套不超过 2 层”为由保留 ConstraintLayout 嵌套 ConstraintLayout。

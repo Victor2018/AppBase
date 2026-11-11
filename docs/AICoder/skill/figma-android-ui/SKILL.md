@@ -78,14 +78,27 @@ description: 将 Figma 设计稿转换为符合 Android 项目规范的 XML 布�
 
 ```
 带折叠 Toolbar 的页面 → CoordinatorLayout + AppBarLayout
-普通页面 → ConstraintLayout（首选）
+普通页面 → ConstraintLayout（首选，保持单层）
 简单线性结构 → LinearLayout
 Fragment 容器/叠加层 → FrameLayout
 ```
 
+> **硬性约束：禁止 ConstraintLayout 嵌套 ConstraintLayout。** 父节点是 ConstraintLayout 时，子节点不能再次使用 ConstraintLayout；`<include>`、`<merge>` 和自定义组合控件同样适用。该规则无例外，优先级高于“最大 2 层”等层级限制。
+
+需要分组、分区或流式排列时，用 `Guideline`、`Barrier`、`Flow`、`Chain`、`Group` 扁平化，不要新建 ConstraintLayout 子布局。复杂子块拆成独立布局文件；如果子布局根节点是 ConstraintLayout，不能再放回 ConstraintLayout 父布局。
+
 ### 4. 生成文件
 
 按照规范文件生成对应的 XML 布局、Kotlin 代码和资源文件。
+
+### 5. 布局自检
+
+输出 XML 前必须检查：
+
+1. 搜索所有 `ConstraintLayout` 开始标签，确认没有任何一个的直接父节点也是 `ConstraintLayout`。可用 XPath 快速检查：`//androidx.constraintlayout.widget.ConstraintLayout//androidx.constraintlayout.widget.ConstraintLayout`，结果必须为空。
+2. 检查 `<include>`、`<merge>` 引入的布局，确认没有间接嵌套。
+3. 检查自定义组合控件，确认没有在 ConstraintLayout 父布局中再引入 ConstraintLayout 实现。
+4. 发现嵌套必须扁平化后重新输出，不能以“嵌套不超过 2 层”为由保留。
 
 ## 参考文档
 
@@ -124,6 +137,8 @@ Fragment 容器/叠加层 → FrameLayout
 ### 布局文件检查
 - [ ] 布局文件名符合命名规范
 - [ ] 根标签选择正确
+- [ ] 没有 ConstraintLayout 嵌套 ConstraintLayout（含 include、merge、自定义控件）
+- [ ] ConstraintLayout 保持单层，没有为分组新增 ConstraintLayout 子布局
 - [ ] 命名空间声明完整且顺序正确
 - [ ] 控件 ID 使用 m + 类型缩写 + 驼峰命名
 - [ ] 尺寸引用 `@dimen/dp_*`
@@ -152,6 +167,11 @@ Fragment 容器/叠加层 → FrameLayout
 - **示例**：Figma 测量 24px → Android `@dimen/dp_24`
 
 ## 更新日志
+
+### v1.1.0
+- 新增硬性约束：禁止 ConstraintLayout 嵌套 ConstraintLayout，include/merge/自定义控件同样适用
+- 新增 ConstraintLayout 扁平化替代方案与生成后布局自检
+- 检查清单增加 ConstraintLayout 嵌套检查项
 
 ### v1.0.0
 - 初始版本
