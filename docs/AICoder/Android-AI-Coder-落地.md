@@ -1,10 +1,12 @@
-# Android 项目使用 Qoder Code 落地文档
+# Android AI Coder 落地
 
 > 适用对象：Android 客户端开发、测试、技术负责人
 >
-> 覆盖范围：Qoder CN 桌面端 + Android Studio Qoder CN 插件为主；Skill 与 Command 可复用到 Cursor、Trae、CodeBuddy、Claude Code 等客户端。内容包含 MCP 配置、Skill 安装、Commands 编排、三个 Skill 的落地流程、跨工具复用、效率分析与质量验收
+> 覆盖范围：Android 项目 AI 编码能力落地——三个 Skill、两个 Command；以 Qoder CN 桌面端 + Android Studio Qoder CN 插件为主要客户端，同一套 Skill 与 Command 可复用到 Cursor、Trae、CodeBuddy、Claude Code。Skill、Command 与 MCP 的配置、凭证获取见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)
 >
-> 版本：v1.3 ｜ 日期：2026-11-11
+> 版本：v1.8 ｜ 日期：2026-11-11
+
+**Android AI Coder** 指沉淀在 Android 工程里的整套 AI 编码能力：MCP 负责「读得到」，三个 Skill 负责「做得对」，两个 Command 负责「串得起来」。它不绑定某个客户端，Qoder 是本文的主要示例，其他客户端的复用方式见 0.6；使用前提见 0.7——规则来自项目架构，架构不清先别接。
 
 ---
 
@@ -12,7 +14,7 @@
 
 ### 0.1 最终目标
 
-让 Qoder 在 Android 项目中具备四项能力：
+让 AI 编码助手在 Android 项目中具备四项能力：
 
 1. **读设计稿**：通过 Figma MCP 读取设计结构和图片，生成符合项目规范的 XML 与页面代码。
 2. **读缺陷单**：通过 TAPD MCP 读取 Bug 详情、评论和流转记录，分析根因并修复。
@@ -85,7 +87,7 @@ Skill 是单点能力，Command 是把单点能力串成流水线的编排层。
 
 - `/android-feature` 内部依次调用 `figma-android-ui`、`android-api-ds`，第四阶段复用 `/android-review` 的标准。
 - `/android-review` 可以脱离流水线单独使用，作为提交前的统一审查入口。
-- 命令的安装与验证见 3.6，完整用法与示例见 4.5。
+- 命令的安装与验证见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 2 节，完整用法与示例见 4.5。
 
 ### 0.6 跨客户端复用：Skill 与 Command 不绑定 Qoder
 
@@ -107,15 +109,7 @@ Skill 是单点能力，Command 是把单点能力串成流水线的编排层。
 
 **Skill 目录对照**
 
-| 客户端 | 项目级（团队共享） | 用户级（个人） |
-|---|---|---|
-| Qoder CN | `.qoder/skills/` | `~/.qoder-cn/skills/` |
-| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
-| Cursor | `.cursor/skills/` | `~/.cursor/skills/` |
-| Trae | `.trae/skills/` | `~/.trae/skills/` |
-| CodeBuddy | `.codebuddy/skills/` | `~/.codebuddy/skills/` |
-
-> 各客户端迭代较快，目录名和加载机制可能调整。安装前以该客户端当前版本的官方说明为准；目录名对不上时，先用 `/skills list` 或设置页确认它实际扫描的位置。
+各客户端的 Skill 安装目录不同，完整对照与安装步骤见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 1.1。
 
 **Command 的承载方式**
 
@@ -158,7 +152,33 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 
 > 跨工具复用的是「规范与流程」，不是「效果完全一致」。各客户端的模型、上下文窗口和工具调用能力不同，生成结果仍要按第 6 节的质量门禁验收。
 
-### 0.7 前置条件
+### 0.7 使用前提：先有架构，再谈 AI
+
+这套能力的规则全部来自项目本身，不是通用模板，也不是 AI 凭空生成的「最佳实践」。
+
+| 前提 | 说明 |
+|---|---|
+| 必须熟悉项目架构 | 使用前先读 README、`settings.gradle`、模块职责、基础库、基类、响应封装与命名规范；能说清新代码该落在哪个模块 |
+| 说明文档要能对上代码 | 架构说明、目录约定、命名规范与代码不一致时先修文档；按错误文档写出的 Skill，产出只会错得更整齐 |
+| 规则来自现有代码 | Skill 里的基类名、包名、分层方式、响应封装、DI 方式，都照搬工程现有实现，不额外发明一套 |
+| 按项目实际情况写 Skill | 本项目三个 Skill 只是样例；换项目要按 1.5 改写 references，不是直接复制过去 |
+| 分层不明确就不建议用 | 没有统一基类、网络封装和模块边界时，AI 只能猜；猜出来的代码进不了 Code Review |
+
+**适用性判断**
+
+| 情况 | 建议 |
+|---|---|
+| 分层清晰：有基础库、统一响应封装、明确模块边界 | 可以直接试用 |
+| 有命名规范与目录约定文档，且与代码一致 | 可以直接试用 |
+| 规范只存在于个人经验，没有文档 | 先整理成文档，或先用 Skill 固化一版 |
+| 架构分层不明确、同类代码有多种写法 | 不建议直接上 Skill，先做架构收敛再引入 |
+| 想跳过项目认知直接生成 | 停下来；文件会放错模块、继承错基类 |
+
+> 直接套用别人项目的 Skill，生成结果看起来对、结构却不对，返工成本比自己写还高。**在架构分层不明确的项目里，第一件事是优化项目结构，而不是接 AI 工具。**
+
+**一句话**：AI 不缺口才，缺的是它不知道你的目录结构、命名规则和分层方式。
+
+### 0.8 环境与技术栈前提
 
 | 项目 | 要求 |
 |---|---|
@@ -205,18 +225,22 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 
 ### 1.1 接入步骤
 
+括号内为 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 的章节号。
+
 ```
+确认项目架构与文档可用（0.7）：分层清晰、规范有文档
+        ↓
 安装 Node.js / 确认 npx
         ↓
-获取 Figma API Key 和 TAPD 个人访问令牌
+获取 Figma API Key 和 TAPD 个人访问令牌（3~4）
         ↓
-配置 MCP（桌面端 + Android Studio 插件）
+配置 MCP（Qoder / Cursor / Trae，5~9）
         ↓
-验证 MCP 连接
+验证 MCP 连接（10）
         ↓
-安装三个 Skill
+安装三个 Skill（1）
         ↓
-安装 Commands（/android-feature、/android-review）
+安装 Commands（/android-feature、/android-review，2）
         ↓
 完成项目架构认知
         ↓
@@ -229,7 +253,7 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 
 | 阶段 | 预计时间 | 产出 |
 |---|---|---|
-| 环境准备 | 0.5 天 | Node、Qoder、Android Studio 可用 |
+| 环境准备 | 0.5 天 | Node、AI 编码客户端、Android Studio 可用 |
 | 凭证与 MCP | 0.5 天 | 两个 MCP 显示「可用 / 已连接」 |
 | Skill 安装 | 10 分钟 | 三个 Skill 出现在技能列表 |
 | Commands 安装 | 5 分钟 | `/android-feature`、`/android-review` 出现在斜杠列表 |
@@ -265,344 +289,33 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 
 ## 2. 配置 MCP
 
-### 2.1 获取 Figma API Key
+MCP 给 AI 提供 Figma 设计稿和 TAPD Bug 的数据通道，配置完成后 Skill 才能读取这些数据。
 
-Figma MCP 需要个人访问令牌（Personal Access Token）才能读取设计文件。
+完整步骤已拆分到 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)，按使用客户端选择对应章节：
 
-**操作步骤**
-
-1. 登录 Figma，点击左上角头像。
-2. 选择「Settings」。
-3. 切换到「Security」标签。
-4. 在「Personal access tokens」区域点击「Generate new token」。
-5. 填写 Token 名称，例如 `qoder_ai`；选择有效期，例如 90 天。
-6. 勾选只读权限。至少需要：
-   - `current_user:read`
-   - `file_content:read`
-   - `file_metadata:read`
-   - `file_versions:read`
-   - `library_assets:read`
-   - `library_content:read`
-   - `team_library_content:read`
-   - `file_dev_resources:read`
-   - `folders:read`
-   - 如需读取评论，再勾选 `file_comments:read`
-7. 点击「Generate token」。
-8. **立即复制 token**，页面关闭后无法再次查看。
-
-![Figma：头像 → Settings](images/figma_1.png)
-
-![Figma：Security → Personal access tokens → Generate new token](images/figma_2.png)
-
-![Figma：填写 Token 名称和有效期，勾选只读权限](images/figma_3.png)
-
-![Figma：继续勾选文件、设计系统等只读权限](images/figma_4.png)
-
-![Figma：确认权限后点击 Generate token](images/figma_5.png)
-
-> 点击「Generate token」后立即复制并保存。为避免凭证泄露，本文档不展示包含真实 token 的截图；分享材料前也请勿使用带 token 的截图。
-
-> 建议只授予只读权限。除非确实需要写评论或修改设计资源，不要勾选 `write` 类权限。
-
----
-
-### 2.2 获取 TAPD 个人访问令牌
-
-**操作步骤**
-
-1. 登录 TAPD。
-2. 点击左下角头像。
-3. 选择「我的设置」。
-4. 在个人设置页面点击「个人访问令牌」。
-5. 点击右上角「+ 创建个人访问令牌」。
-6. 填写名称，例如 `qoder_ai`，创建后立即复制令牌。
-
-![TAPD：头像 → 我的设置](images/tapd_1.png)
-
-![TAPD：个人设置 → 个人访问令牌](images/tapd_2.png)
-
-![TAPD：创建个人访问令牌](images/tapd_3.png)
-
-> TAPD 令牌通常只显示一次。创建后先保存到本地密码管理器，再填入 MCP 配置。
-
----
-
-### 2.3 MCP 配置 JSON
-
-下面是本项目的 MCP 配置模板。请把占位符替换成你自己的 token，**不要把真实值提交到仓库**。
-
-```json
-{
-  "mcpServers": {
-    "figma_mcp": {
-      "command": "npx",
-      "args": ["-y", "figma-developer-mcp", "--stdio"],
-      "env": {
-        "FIGMA_API_KEY": "<YOUR_FIGMA_API_KEY>"
-      }
-    },
-    "tapd_mcp": {
-      "command": "npx",
-      "args": ["-y", "tapd-mcp-server"],
-      "env": {
-        "TAPD_ACCESS_TOKEN": "<YOUR_TAPD_ACCESS_TOKEN>"
-      }
-    }
-  }
-}
-```
-
-**字段说明**
-
-| 字段 | 说明 |
+| 内容 | 位置 |
 |---|---|
-| `mcpServers` | MCP 服务集合，桌面端和插件都使用这个结构 |
-| `figma_mcp` | 服务名，建议保持与 Skill 中的工具引用一致 |
-| `command` | 启动命令，这里使用 `npx` |
-| `args` | `-y` 表示自动确认安装；`figma-developer-mcp --stdio` 以标准输入输出模式启动 |
-| `env` | 传给 MCP 服务的环境变量，token 放在这里 |
-| `tapd_mcp` | TAPD MCP 服务名 |
-| `tapd-mcp-server` | TAPD MCP 的 npm 包名 |
+| 获取 Figma API Key | 第 3 节 |
+| 获取 TAPD 个人访问令牌 | 第 4 节 |
+| MCP 配置 JSON 模板 | 第 5 节 |
+| Qoder 桌面端 / IDE 插件配置 | 第 6、7 节 |
+| Cursor / Trae 配置 | 第 8、9 节 |
+| 验证 MCP 与常见问题 | 第 10 节 |
 
-> 如果团队需要共享配置，提交一份 `mcp.example.json`（只含占位符），真实 `mcp.json` 放在本地并加入 `.gitignore`。
-
----
-
-### 2.4 Qoder CN 桌面端配置
-
-**操作步骤**
-
-1. 打开 Qoder CN 桌面端。
-2. 左侧点击「扩展」。
-3. 顶部切换到「连接器」。
-4. 点击右上角「添加连接器」。
-5. 选择「添加自定义 MCP」。
-6. 切换到「JSON」标签。
-7. 粘贴上面的 `mcpServers` 配置。
-8. 点击「预览导入」，确认后保存。
-9. 回到「扩展管理」→「连接器」，确认 `figma_mcp` 和 `tapd_mcp` 显示「可用」，并打开右侧开关。
-
-![Qoder CN 桌面端：扩展 → 连接器 → 添加连接器](images/qoder_cn_desktop_mcp_1.png)
-
-> 「添加自定义 MCP」截图中的 JSON 会包含真实 API Key，本文档不嵌入该截图。请按界面选择 JSON 标签，粘贴第 2.3 节的脱敏模板并填入本地 token，然后点击「预览导入」。
-
-![Qoder CN 桌面端：扩展管理 → 连接器，确认两个 MCP 可用](images/qoder_cn_desktop_mcp_3.png)
-
-**配置文件位置**
-
-桌面端的自定义 MCP 配置会保存到：
-
-```
-C:\Users\<用户名>\.qoder-cn\settings.json
-```
-
-其中的 `mcpServers` 字段即上面粘贴的内容。也可以直接编辑该文件，但修改后需要重启或重新加载。
-
----
-
-### 2.5 Android Studio Qoder CN 插件配置
-
-**操作步骤**
-
-1. 打开 Android Studio。
-2. 进入 `Settings`（Windows/Linux）或 `Preferences`（macOS）。
-3. 找到 `Other Settings → Qoder CN → 个人设置 → MCP 服务器`。
-4. 点击「打开」，打开配置文件：
-
-```
-C:\Users\<用户名>\.qoder-cn\shared_client\mcp.json
-```
-
-5. 把上面的 `mcpServers` JSON 粘贴进去并保存。
-6. 回到设置页点击「刷新」。
-7. 确认 `figma_mcp` 和 `tapd_mcp` 的状态为「已连接」，并勾选「已启用」。
-8. 如果状态没有变化，重启 Android Studio。
-
-![Android Studio Qoder CN 插件：Settings → Other Settings → Qoder CN → MCP 服务器](images/qoder_cn_ide_plugin_mcp.png)
-
-> 桌面端和 IDE 插件可能使用不同的配置文件：桌面端是 `~/.qoder-cn/settings.json`，插件是 `~/.qoder-cn/shared_client/mcp.json`。两端都要用，就两端都配置。
-
----
-
-### 2.6 验证 MCP
-
-**桌面端验证**
-
-1. 「扩展管理 → 连接器」中两个服务显示「可用」。
-2. 新建任务，输入：「调用 `tapd_list_workspaces`，列出我有权限的项目空间。」
-3. 能返回项目列表，说明 TAPD MCP 正常。
-4. 输入：「使用 `figma_mcp` 读取这个设计稿的节点信息：<链接>。」
-5. 能返回节点树，说明 Figma MCP 正常。
-
-**IDE 插件验证**
-
-1. `Settings → Other Settings → Qoder CN → 个人设置 → MCP 服务器` 中状态为「已连接」。
-2. 在 Qoder 对话中调用 `tapd_list_workspaces` 或读取 Figma 节点。
-3. 如果显示未连接，先点「刷新」，再重启 IDE。
-
-**终端验证**
-
-```bash
-node -v
-npx -v
-
-# 检查 npm 包能否拉取并启动；启动后按 Ctrl+C 退出
-npx -y tapd-mcp-server
-npx -y figma-developer-mcp --stdio
-```
-
-首次执行会下载 npm 包，需要网络。如果命令能启动并输出日志，说明运行环境正常；如果报错，先解决 Node/npm 问题。
-
-**常见状态**
-
-| 状态 | 含义 | 处理 |
-|---|---|---|
-| 可用 / 已连接 | MCP 启动成功 | 可以开始使用 |
-| 错误 / 未连接 | 启动失败或 token 无效 | 查看日志，检查 `npx`、网络、token |
-| 一直加载 | 首次下载依赖或网络慢 | 等待或改用国内 npm 源 |
-| 工具列表为空 | 服务启动但未暴露工具 | 检查包名和启动参数 |
+进入下一步前，确认 `figma_mcp` 和 `tapd_mcp` 在所用客户端中显示已连接 / 可用，并能成功调用一次工具。
 
 ---
 
 ## 3. 添加 Skill 与 Command
 
-### 3.1 安装位置
+Skill 与 Command 都不需要编译或安装依赖，把文件放进客户端扫描的目录即可生效。
 
-Skill 支持用户级和项目级两种安装方式：
-
-| 级别 | 路径 | 适用场景 |
-|---|---|---|
-| 用户级 | `C:\Users\<用户名>\.qoder-cn\skills\` | 个人使用，所有项目可用 |
-| 项目级 | `<项目根目录>\.qoder\skills\` | 团队共享，跟随仓库版本管理 |
-
-推荐：
-
-- 个人日常开发使用用户级。
-- 团队统一规范使用项目级，把 `.qoder/skills/` 提交到仓库，保证所有人使用同一版本。
-
-> 上表是 Qoder 的路径。使用 Cursor、Trae、CodeBuddy、Claude Code 等客户端时，Skill 正文不用修改，只需放到对应目录（如 `.cursor/skills/`、`.trae/skills/`、`.codebuddy/skills/`），完整对照见 0.6。
-
-### 3.2 目录结构
-
-把三个 Skill 文件夹放到 skills 目录下：
-
-```
-skills/
-├── figma-android-ui/
-│   ├── SKILL.md
-│   └── references/
-│       ├── class-naming.md
-│       ├── variable-naming.md
-│       ├── ...
-│       └── architecture-spec.md
-├── android-api-ds/
-│   ├── SKILL.md
-│   ├── README.md
-│   └── references/
-│       ├── naming-spec.md
-│       └── code-templates.md
-└── fix-tapd-android-bug/
-    └── SKILL.md
-```
-
-要求：
-
-- 每个 Skill 必须有 `SKILL.md`。
-- 文件夹名、`SKILL.md` 的 frontmatter `name`、Command 中的引用三者保持一致：`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug`。
-- `references/` 中的规范文件保持单一职责，不要把命名、布局、代码风格混在一个文件里。
-
-### 3.3 安装与加载
-
-**方式一：手动复制**
-
-```text
-把 figma-android-ui、android-api-ds、fix-tapd-android-bug 三个文件夹
-复制到 C:\Users\<用户名>\.qoder-cn\skills\
-```
-
-**方式二：项目级安装**
-
-```text
-在项目根目录创建 .qoder\skills\
-把三个 Skill 文件夹复制进去
-```
-
-**加载**
-
-- 桌面端：重新打开 Qoder，或在对话中执行 `/skills reload`。
-- IDE 插件：重启 Android Studio，或执行 `/skills reload`。
-- 查看列表：`/skills list`。
-
-### 3.4 验证 Skill 是否生效
-
-| 客户端 | 查看位置 |
+| 内容 | 位置 |
 |---|---|
-| Qoder CN 桌面端 | 左侧「扩展」→「扩展管理」→「技能」标签 |
-| Android Studio 插件 | `Settings → Other Settings → Qoder CN → 技能、智能体与指令` |
-| 对话 | `/skills list` |
+| Skill 安装路径、各客户端目录对照、生效验证、项目适配与维护 | [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 1 节 |
+| Command 安装路径、编写要求、加载与验证 | [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 2 节 |
 
-验证方式：
-
-1. 三个 Skill 都出现在列表中。
-2. 输入触发语句，例如「根据这个 Swagger 文档生成网络请求代码」，Qoder 能识别并调用 `android-api-ds`。
-3. 如果没识别，检查文件夹层级是否多套了一层，例如 `skills/android-api-ds/android-api-ds/SKILL.md` 是错误结构。
-
-### 3.5 Skill 与项目的适配
-
-三个 Skill 内置的是参考项目的规范。换到新项目时，先确认并调整：
-
-| 文件 | 需要确认的内容 |
-|---|---|
-| `android-api-ds/references/code-templates.md` | 基类名、包名、响应封装、DataSource 基类 |
-| `android-api-ds/references/naming-spec.md` | 实体、Service、DS、VM 的命名 |
-| `figma-android-ui/references/package-naming.md` | 项目的模块名和包名 |
-| `figma-android-ui/references/architecture-spec.md` | 模块依赖、DI、路由、事件总线 |
-| `figma-android-ui/references/color-naming.md` | 颜色是否统一放在 `lib_common` |
-| `figma-android-ui/references/drawable-xml-spec.md` | Drawable 复用和创建规则 |
-
-> Skill 不是装完就结束。项目基类或目录调整后，要同步更新 references，否则生成结果会和工程实际脱节。
-
-**Skill 维护要求**
-
-- 每个 reference 只负责一类规则，不要把命名、布局、代码风格混在一个文件里。
-- 项目基类、包名、响应封装变更时，同步更新 `code-templates.md` 和 `architecture-spec.md`。
-- Skill 变更记录版本号，例如 `v1.0.0` → `v2.0.0`。
-- 每次项目迭代后，把新出现的反例补充进检查清单。
-- 团队内指定维护人，避免 Skill 与工程实际逐渐脱节。
-
-### 3.6 安装 Command
-
-Command 是 commands 目录下的一份 Markdown 文件，**文件名即命令名**。安装级别与 Skill 一致：
-
-| 级别 | 路径 | 适用场景 |
-|---|---|---|
-| 用户级 | `C:\Users\<用户名>\.qoder-cn\commands\` | 个人使用，所有项目可调用 |
-| 项目级 | `<项目根目录>\.qoder\commands\` | 团队共享，跟随仓库版本管理 |
-
-把仓库中的两个命令文件复制进去：
-
-```
-commands/
-├── android-feature.md     # 调用名：/android-feature
-└── android-review.md      # 调用名：/android-review
-```
-
-要求：
-
-- 文件名使用 kebab-case，与调用名一致：`android-feature.md` → `/android-feature`。
-- frontmatter 只写 `description`，用于斜杠列表中的说明。
-- 命令正文里引用的 Skill 路径必须是本机真实存在的路径；项目级安装时，路径改成团队约定的位置。
-- Command 依赖 3.1~3.3 节安装的三个 Skill，先装 Skill 再装 Command。
-- 命令正文引用 Skill 时优先写名称（如 `figma-android-ui`），不要写死客户端专属的绝对路径，便于在其他客户端复用。
-
-> 其他客户端没有自定义斜杠命令机制时，把命令正文当作规则文件或固定 Prompt 使用即可，编排逻辑不变，见 0.6。
-
-**加载与验证**
-
-1. 重新打开客户端，或在对话输入 `/`，列表中应出现 `android-feature` 和 `android-review`。
-2. 输入 `/android-feature` 不带参数，应一次性问齐设计稿链接、接口文档链接和功能名，而不是报错。
-3. 输入 `/android-review`，应先读取 diff，再输出「概览 → 问题表 → 修复方案」。
-4. 看不到命令时，确认文件在 `commands` 目录、扩展名是 `.md`，再重开客户端或重启 IDE。
+安装完成后确认：`/skills list` 能看到三个 Skill，输入 `/` 能看到 `android-feature` 和 `android-review`。
 
 > 命令与 Skill 不要混放：Skill 进 `skills/`，Command 进 `commands/`。放错目录时，两边都不会出现在列表里。
 
@@ -612,7 +325,7 @@ commands/
 
 ### 4.0 落地前统一动作：项目认知
 
-在使用任何 Skill 前，先让 Qoder 只读理解项目，不要直接生成代码。Skill 解决的是「按规范产出」，前提是它知道规范属于哪个项目、代码应该落在哪里。使用前必须先完成项目认知，不能把架构判断交给 AI 猜测。
+在使用任何 Skill 前，先让 AI 编码助手只读理解项目，不要直接生成代码。前提是项目本身有清晰的分层与文档（见 0.7）；架构未收敛时，先优化结构，再谈 AI。Skill 解决的是「按规范产出」，前提是它知道规范属于哪个项目、代码应该落在哪里。使用前必须先完成项目认知，不能把架构判断交给 AI 猜测。
 
 **必须先阅读的文档**
 
@@ -663,7 +376,7 @@ commands/
 
 **建议的认知动作**
 
-1. 先让 Qoder 只读不改，输出一份「项目架构理解摘要」。
+1. 先让 AI 编码助手只读不改，输出一份「项目架构理解摘要」。
 2. 人工核对模块依赖、分层职责、资源归属和新文件落点。
 3. 确认摘要无误后，再进入具体页面、接口或 Bug 任务。
 4. 生成过程中如发现架构与文档不一致，以当前代码为准，并回写文档。
@@ -1190,7 +903,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 | 1 | 完成项目认知，确认模块职责和文件落点 | 开发者 | 架构理解摘要 |
 | 2 | 创建分支，保持工作区干净 | 开发者 | 可审查的 diff |
 | 3 | 选择 Skill，准备完整输入 | 开发者 | 链接、模块、动作、路径 |
-| 4 | 让 Qoder 生成或分析 | 开发者 | 代码、方案、文件清单 |
+| 4 | 让 AI 编码助手生成或分析 | 开发者 | 代码、方案、文件清单 |
 | 5 | 人工检查文件落点和依赖方向 | 开发者 | 修正意见 |
 | 6 | 编译、静态检查、关键路径自测 | 开发者 | 自测记录 |
 | 7 | 按验收清单逐项确认 | 开发者 | 验收结论 |
@@ -1289,7 +1002,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 | 风险 | 表现 | 对策 |
 |---|---|---|
 | 跳过项目认知 | 文件放错模块、继承错基类、架构不一致 | 使用前完成 4.0 的文档阅读和架构摘要确认 |
-| 设计稿结构混乱 | 生成的层级和命名不合理 | 设计侧整理图层；先让 Qoder 输出结构分析再生成 |
+| 设计稿结构混乱 | 生成的层级和命名不合理 | 设计侧整理图层；先让 AI 编码助手输出结构分析再生成 |
 | 用截图代替设计稿 | 尺寸、颜色、间距不准确 | 尽量使用设计稿链接；截图结果必须校准 |
 | 接口文档缺字段说明 | 实体注释空泛、类型误判 | 补充文档或在提问中说明业务含义 |
 | TAPD 评论不完整 | 根因判断偏差 | 评论优先，但仍需与开发/测试确认 |
@@ -1297,6 +1010,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 | 规范漂移 | 工程改了基类，Skill 未更新 | 把 Skill 纳入工程规范维护范围 |
 | 一次生成范围过大 | 文件冲突、遗漏、难以审查 | 按页面、接口、Bug 拆分任务 |
 | 误用不匹配的架构 | Hilt/Compose 项目套用旧模板 | 先适配 references，再使用 |
+| 项目架构未收敛 | 同类代码多种写法，生成结果随机、无法评审 | 先统一基类、网络封装与模块边界，见 0.7 |
 | 用 `-y` 跳过交接 | 阶段没自检就进入下一阶段，问题被后移 | 试点期不加 `-y`；只在 Skill 校准后对低风险功能使用 |
 | 命令与 Skill 脱节 | Command 引用的 Skill 路径或名称变更，命令仍在跑旧流程 | 命令和 Skill 同仓库维护，改目录或名称时同步更新命令正文 |
 | 一条命令跑太大范围 | 一个功能塞多个页面、多个模块，diff 无法审查 | 命令只按单页面/单接口粒度使用，超出则拆分任务 |
@@ -1307,65 +1021,20 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 
 ## 8. 常见问题排查
 
-### 8.1 MCP 相关
+配置类问题（MCP 未连接、Skill 不出现在列表、命令调不起来）按客户端查 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)：Skill 见第 1 节，Command 见第 2 节，MCP 见第 10 节。
+
+本节只列生成结果本身的问题。
+
+### 8.1 生成结果相关
 
 | 现象 | 可能原因 | 处理 |
 |---|---|---|
-| 状态显示「错误」 | `npx` 不存在、包下载失败、token 无效 | 终端执行 `node -v`、`npx -v`，再手动运行 MCP 命令 |
-| 状态一直加载 | 首次下载依赖或网络慢 | 等待，或切换 npm 源 |
-| Figma 返回 401/403 | token 失效、权限不足、无文件访问权限 | 重新生成 token，确认勾选 `file_content:read`，确认账号有文件权限 |
-| TAPD 返回 401 | 令牌失效或复制不完整 | 重新创建个人访问令牌 |
-| 桌面端可用、IDE 不可用 | 两端配置文件不同 | 分别配置 `settings.json` 和 `shared_client/mcp.json` |
-| 工具列表为空 | 包名或启动参数错误 | 核对 `figma-developer-mcp --stdio` 和 `tapd-mcp-server` |
-
-### 8.2 Skill 相关
-
-| 现象 | 可能原因 | 处理 |
-|---|---|---|
-| 技能列表看不到 | 目录层级错误、缺少 `SKILL.md` | 检查 `skills/<name>/SKILL.md`，执行 `/skills reload` |
-| 名称不对 | 文件夹名与 frontmatter `name` 不一致 | 统一为 `android-api-ds` 等名称 |
-| 触发了但没有工具 | MCP 未启用 | 在桌面端或 IDE 中打开连接器开关 |
-| 生成代码不符合项目 | references 未适配 | 更新基类、包名、响应封装等配置 |
 | 生成结果放错模块 | 未做项目认知 | 先读架构文档，再指定模块和目录 |
-| 换用 Cursor/Trae/CodeBuddy 后技能不出现 | 各客户端 Skill 目录不同 | 按 0.6 的对照表放置或建软链，`SKILL.md` 正文不用改 |
-
-### 8.3 生成结果相关
-
-| 现象 | 可能原因 | 处理 |
-|---|---|---|
 | 文件重复创建 | 模块已有同类文件 | 要求追加而不是覆盖 |
 | 颜色/资源重复 | 未检查 `lib_common` | 生成前明确要求先查重 |
 | 图片尺寸不对 | 设计稿不是 3x 或导出倍率错误 | 重新导出 3x PNG |
 | 布局层级过深 | 设计结构复杂 | 要求扁平化 ConstraintLayout，禁止 ConstraintLayout 嵌套 ConstraintLayout |
 | Bug 修复范围过大 | 未限制改动范围 | 明确最小改动原则，只改必要代码 |
-
-### 8.4 图片无法显示
-
-本文档中的图片使用相对路径 `images/xxx.png`。请保持 Markdown 文件与 `images` 目录在同一级：
-
-```
-<文档目录>/
-├── Qoder-Code-Android-落地文档.md
-└── images/
-    ├── figma_1.png
-    ├── tapd_1.png
-    └── qoder_cn_desktop_mcp_1.png
-```
-
-如果移动了文档，需要同步调整图片路径。
-
-### 8.5 Commands 相关
-
-| 现象 | 可能原因 | 处理 |
-|---|---|---|
-| 输入 `/` 看不到命令 | 文件不在 commands 目录、扩展名不是 `.md`、客户端未重载 | 放到 `~/.qoder-cn/commands/` 或 `.qoder/commands/`，重开客户端或重启 IDE |
-| 命令名与预期不同 | 文件名即命令名 | 文件名改成 `android-feature.md`，调用 `/android-feature` |
-| 命令执行但不按规范 | Skill 未安装，或命令中引用的 Skill 路径不存在 | 先完成第 3 节安装；核对命令正文里的路径与本机一致 |
-| 参数被识别错 | 链接域名不在识别列表，或文本与链接混排 | 显式写「设计稿：<链接>」「接口文档：<链接>」「功能名：<名称>」 |
-| 想每阶段确认却一路跑完 | 输入了 `-y` | 去掉 `-y`；或在任务开始时说明「每阶段停下等我确认」 |
-| 命令只跑了 UI 就结束 | 未提供接口文档，或接口未定稿 | 补齐接口文档；按 4.5 的「什么时候用命令」改为单点 Skill |
-| 命令与项目级 Skill 冲突 | 项目级和用户级同名 Skill 并存 | 只保留一处；团队规范统一用项目级 |
-| 换用其他客户端后 `/` 里没有命令 | 该客户端不支持自定义斜杠命令 | 把命令正文作为规则文件或固定 Prompt 使用；Skill 仍可单独触发（见 0.6） |
 
 ---
 
@@ -1416,26 +1085,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 
 ### 11.1 MCP 配置模板（脱敏）
 
-```json
-{
-  "mcpServers": {
-    "figma_mcp": {
-      "command": "npx",
-      "args": ["-y", "figma-developer-mcp", "--stdio"],
-      "env": {
-        "FIGMA_API_KEY": "<YOUR_FIGMA_API_KEY>"
-      }
-    },
-    "tapd_mcp": {
-      "command": "npx",
-      "args": ["-y", "tapd-mcp-server"],
-      "env": {
-        "TAPD_ACCESS_TOKEN": "<YOUR_TAPD_ACCESS_TOKEN>"
-      }
-    }
-  }
-}
-```
+完整模板、字段说明与各客户端入口见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 5 节。文档与仓库只保留占位符版本，真实 token 不进入 Git。
 
 ### 11.2 常用 Prompt 汇总
 
@@ -1594,7 +1244,7 @@ module_*/src/main/res/
 
 | 项目差异 | 适配动作 |
 |---|---|
-| 基类命名不同 | 修改 `code-templates.md`，或首次使用时明确告知 Qoder |
+| 基类命名不同 | 修改 `code-templates.md`，或首次使用时明确告知 AI 编码助手 |
 | 响应封装不同 | 替换模板中的 `NetworkResponse` / `BaseRes` / `HttpResult` |
 | 使用 Hilt/Koin | 去掉 `VMFactory` 和 `InjectorUtils`，改为注解注入 |
 | 网络模块位置不同 | 首次确认网络模块名、基础包名、目录结构 |
@@ -1682,8 +1332,8 @@ module_*/src/main/res/
 **最短上手路径**
 
 ```text
-1. 装 Skill（第 3 节）→ /skills list 确认三个 Skill
-2. 装 Command（3.6）→ 输入 / 确认两个命令
+1. 装 Skill（SKILL-MCP-COMMAND配置指南 第 1 节）→ /skills list 确认三个 Skill
+2. 装 Command（SKILL-MCP-COMMAND配置指南 第 2 节）→ 输入 / 确认两个命令
 3. 项目认知（4.0）→ 确认模块与落点
 4. 单点试点（4.1~4.3）→ 校准 references
 5. 完整功能（4.5）→ /android-feature ... -y
@@ -1700,3 +1350,8 @@ module_*/src/main/res/
 | v1.1 | 2026-11-06 | 合并技术分享内容：Skill 定位与效率分析、规范与元素映射、边界风险、落地路线、速查表与分享提纲 |
 | v1.2 | 2026-11-11 | 新增 Commands：安装与验证、`/android-feature` 四阶段流水线、`/android-review` 双规范审查、输入解析与 `-y` 门禁、故障排查与速查；统一 Skill 命名为 `android-api-ds` / `fix-tapd-android-bug` |
 | v1.3 | 2026-11-11 | 新增 0.6 跨客户端复用：Skill 与 Command 不绑定 Qoder，可用于 Cursor、Trae、CodeBuddy、Claude Code 等客户端；补充目录对照、Command 承载方式、共享安装与跨工具差异 |
+| v1.4 | 2026-11-11 | 文档更名为「Android AI Coder 落地」；通用能力描述由 Qoder 改为 AI 编码助手，客户端操作步骤仍以 Qoder 为例 |
+| v1.5 | 2026-11-11 | 截图按 `images/api_key`、`images/mcp` 重新分组并更新路径；新增 Cursor、Trae 的 MCP 配置与验证截图；MCP 配置与 Figma/TAPD 凭证获取拆分到独立文档 |
+| v1.6 | 2026-11-11 | Skill 与 MCP 的配置内容统一收敛到 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)，主文档只保留入口与流程；文档更名为「SKILL-MCP-配置指南」 |
+| v1.7 | 2026-11-11 | 指南更名为「SKILL-MCP-COMMAND 配置指南」并新增 Command 配置章节；主文档精简 Skill/Command/MCP 配置与配置类排查，只保留入口、流程与生成结果问题 |
+| v1.8 | 2026-11-11 | 新增 0.7 使用前提：必须熟悉项目架构、规则来自项目架构、按项目实际情况写 Skill；补充适用性判断与「分层不明确先优化项目」的建议 |
