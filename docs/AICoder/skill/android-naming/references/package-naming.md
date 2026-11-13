@@ -13,23 +13,7 @@
 
 ### 顶层包名
 
-| 模块 | 包名 |
-|------|------|
-| App 模块 | `com.ydj.driver` |
-| 基础库 | `com.ydj.lib.common` |
-| 数据层 | `com.ydj.lib.coremodel` |
-| 网络层 | `com.ydj.lib.http` |
-| 支付库 | `com.ydj.lib.pay` |
-| 图片压缩 | `com.ydj.lib.luban` |
-| 插件库 | `com.ydj.lib.qmf.ppplugin.android` |
-| 首页模块 | `com.ydj.module.home` |
-| 登录模块 | `com.ydj.module.login` |
-| 配送模块 | `com.ydj.module.delivery` |
-| 我的模块 | `com.ydj.module.me` |
-| 消息模块 | `com.ydj.module.message` |
-| 钱包模块 | `com.ydj.module.wallet` |
-| 地图模块 | `com.ydj.module.map` |
-| 构建插件 | `com.ydj.convention.buildlogic` |
+模块目录名、`namespace` 与包名的对应关系见 `module-naming.md`，本文不重复列出。以下只规定模块内部的包结构。
 
 ## 模块内包结构
 
@@ -114,7 +98,6 @@ com.ydj.lib.http/
 |------|------|
 | 全小写 | 包名全部使用小写字母 |
 | 点号分隔 | 使用 `.` 分隔层级 |
-| 反向域名 | 以 `com.ydj` 开头 |
 | 语义清晰 | 包名应能表达其内容类型 |
 | 单数形式 | 使用 `util` 而非 `utils`（包名） |
 | 避免缩写 | 除非是广泛认可的缩写（如 `vm`, `ds`） |

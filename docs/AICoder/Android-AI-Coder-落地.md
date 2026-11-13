@@ -2,11 +2,11 @@
 
 > 适用对象：Android 客户端开发、测试、技术负责人
 >
-> 覆盖范围：Android 项目 AI 编码能力落地——三个 Skill、两个 Command；以 Qoder CN 桌面端 + Android Studio Qoder CN 插件为主要客户端，同一套 Skill 与 Command 可复用到 Cursor、Trae、CodeBuddy、Claude Code。Skill、Command 与 MCP 的配置、凭证获取见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)
+> 覆盖范围：Android 项目 AI 编码能力落地——七个 Skill（三个流程 Skill + 四个工程骨架 Skill：命名 `android-naming`、模块 `android-module`、工程 `android-project`、构建逻辑 `android-build-logic`）、三个 Command；以 Qoder CN 桌面端 + Android Studio Qoder CN 插件为主要客户端，同一套 Skill 与 Command 可复用到 Cursor、Trae、CodeBuddy、Claude Code。Skill、Command 与 MCP 的配置、凭证获取见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)
 >
-> 版本：v1.8 ｜ 日期：2026-11-11
+> 版本：v1.15 ｜ 日期：2026-11-13
 
-**Android AI Coder** 指沉淀在 Android 工程里的整套 AI 编码能力：MCP 负责「读得到」，三个 Skill 负责「做得对」，两个 Command 负责「串得起来」。它不绑定某个客户端，Qoder 是本文的主要示例，其他客户端的复用方式见 0.6；使用前提见 0.7——规则来自项目架构，架构不清先别接。
+**Android AI Coder** 指沉淀在 Android 工程里的整套 AI 编码能力：MCP 负责「读得到」，Skill 负责「做得对」，Command 负责「串得起来」。它不绑定某个客户端，Qoder 是本文的主要示例，其他客户端的复用方式见 0.6；使用前提见 0.7——规则来自项目架构，架构不清先别接。
 
 ---
 
@@ -18,8 +18,8 @@
 
 1. **读设计稿**：通过 Figma MCP 读取设计结构和图片，生成符合项目规范的 XML 与页面代码。
 2. **读缺陷单**：通过 TAPD MCP 读取 Bug 详情、评论和流转记录，分析根因并修复。
-3. **按项目规范产出**：通过三个 Skill 约束目录结构、命名、分层、资源位置和验收标准。
-4. **一键串联流程**：通过 Commands 把「UI → 接口 → 数据上屏 → 审查」固定成一条命令，减少阶段遗漏和人工交接。
+3. **按项目规范产出**：通过 Skill 约束工程骨架、模块结构、命名、分层、资源位置和验收标准。
+4. **一键串联流程**：通过 Commands 把「建工程 → UI → 接口 → 数据上屏 → 审查」固定成命令，减少阶段遗漏和人工交接。
 
 ### 0.2 先区分 MCP、Skill 与 Command
 
@@ -27,7 +27,7 @@
 |---|---|---|
 | MCP | 给 AI 提供工具和数据通道 | Figma MCP 读取设计稿；TAPD MCP 读取 Bug |
 | Skill | 给 AI 提供单点任务的流程、规范和检查清单 | 设计稿怎么转 XML、接口链路怎么分层、Bug 怎么定位 |
-| Command | 把多个 Skill 和 MCP 调用按固定顺序、固定门禁编排成一条可复用指令 | `/android-feature` 串起 UI → 接口 → 上屏 → 审查；`/android-review` 双规范审查 |
+| Command | 把多个 Skill 和 MCP 调用按固定顺序、固定门禁编排成一条可复用指令 | `/android-create-project` 从零建工程与模块；`/android-feature` 串起 UI → 接口 → 上屏 → 审查；`/android-review` 双规范审查 |
 
 三者缺一不可：只有 MCP，AI 能读到数据但不知道项目规范；只有 Skill，AI 知道规范但读不到 Figma/TAPD，而且需要人逐个触发；只有 Command，能串起流程但每个环节没有可依据的规范。
 
@@ -37,15 +37,23 @@
 
 Skill 和 Command 都不是 Qoder 专有能力：Skill 是遵循开放约定的 Markdown 指令包，Command 是一份 Markdown 编排提示词。换到 Cursor、Trae、CodeBuddy、Claude Code 等客户端时，规范内容和流程不变，只需要换安装目录和触发方式，见 0.6。
 
-### 0.3 三个 Skill 一页速览
+### 0.3 七个 Skill 一页速览
 
-| Skill | 解决什么问题 | 输入 | 主要产出 | 覆盖阶段 |
-|---|---|---|---|---|
-| `figma-android-ui` | 设计稿到 XML 布局的重复还原与命名不统一 | Figma / MasterGo / 即时设计 / 蓝湖 / Sketch / XD / PS 链接或截图 | XML 布局、Activity/Fragment 代码、资源命名与切图清单 | UI 开发 |
-| `android-api-ds` | 一个接口要写 8~9 个文件，容易漏层、漏字段 | Swagger / Knife4j 文档链接或截图 | Req、Data、Api、ApiService、IDS、DS、VM、VMFactory、InjectorUtils | 接口联调 |
-| `fix-tapd-android-bug` | Bug 上下文分散，描述与评论不一致，修复易漏文案 | TAPD Bug 链接或 Bug ID | 根因分析、修复方案、代码修改 | 提测与缺陷修复 |
+七个 Skill 分两组：三个流程 Skill 卡在日常开发的三段高频环节，四个工程骨架 Skill 管工程启动、模块拆分与编译配置。两组共用同一份 `android-naming`。
 
-**一句话结论**：这三个 Skill 不是让 AI 随便写代码，而是把团队已有的目录结构、命名规范、分层方式和检查清单变成 AI 可执行的约束，让产出直接接近可提交状态，减少返工和 Review 轮次。
+| Skill | 分组 | 解决什么问题 | 输入 | 主要产出 | 落地章节 |
+|---|---|---|---|---|---|
+| `figma-android-ui` | 流程 | 设计稿到 XML 布局的重复还原与命名不统一 | Figma / MasterGo / 即时设计 / 蓝湖 / Sketch / XD / PS 链接或截图 | XML 布局、Activity/Fragment 代码、资源命名与切图清单 | 4.1 |
+| `android-api-ds` | 流程 | 一个接口要写 8~9 个文件，容易漏层、漏字段 | Swagger / Knife4j 文档链接或截图 | Req、Data、Api、ApiService、IDS、DS、VM、VMFactory、InjectorUtils | 4.2 |
+| `fix-tapd-android-bug` | 流程 | Bug 上下文分散，描述与评论不一致，修复易漏文案 | TAPD Bug 链接或 Bug ID | 根因分析、修复方案、代码修改 | 4.3 |
+| `android-naming` | 骨架 | 命名规则散落在各处，每个 Skill 各维护一份 | 生成代码、新建模块、新增插件或资源、审查命名 | 15 份 references：控件 ID、布局、颜色、类与包、模块、插件 id、网络层 | 4.4.1 |
+| `android-project` | 骨架 | 新工程要装配根脚本、版本目录、build-logic 与 app 壳 | 工程根目录、工程名、包名域、applicationId、版本号 | 可运行工程骨架 + app 壳 + build-logic 初版 | 4.4.2 |
+| `android-build-logic` | 骨架 | 编译配置在各模块重复声明，插件注册易漏 | build-logic 或已有工程、要统一的编译配置 | 8 个约定插件、support 配置层、插件注册与验证 | 4.4.3 |
+| `android-module` | 骨架 | 模块目录、双清单、路由入口、资源前缀要一次配齐 | 模块类型（`module_` / `lib_`）、业务名、包名域 | 模块骨架、双清单、构建脚本、ARouter 入口、注册 | 4.4.4 |
+
+**一句话结论**：这七个 Skill 不是让 AI 随便写代码，而是把团队已有的目录结构、命名规范、分层方式和检查清单变成 AI 可执行的约束，让产出直接接近可提交状态，减少返工和 Review 轮次。
+
+**分组使用**：日常开发用流程 Skill（4.1~4.3）；项目启动、模块拆分、组件化改造时用骨架 Skill（4.4）。具体命名规则（控件 ID、布局文件、颜色、字符串、类与包、模块与 namespace、工程名与 applicationId、网络层、插件 id）只在 `android-naming` 维护一份，其余 Skill 一律回读，不重复定义。
 
 **它们不覆盖**：需求评审、服务端开发、自动化测试、发布上线。
 
@@ -72,26 +80,28 @@ Skill（SKILL.md + references）
 
 它带来的不是单次写得更快，而是**同一类任务每次都能按同一标准完成**。
 
-当多个 Skill 需要按固定顺序协作时，再向上固化一层 Command：Skill 定义「每一步怎么做」，Command 定义「先做哪步、做到什么程度才进入下一步」。见 0.5 与 4.5。
+当多个 Skill 需要按固定顺序协作时，再向上固化一层 Command：Skill 定义「每一步怎么做」，Command 定义「先做哪步、做到什么程度才进入下一步」。见 0.5 与 4.6。
 
 > AI 可以加速生成，但不能替代业务判断、代码审查和测试验证。效率提升必须建立在质量达标之上。
 
-### 0.5 两个 Command 一页速览
+### 0.5 三个 Command 一页速览
 
-Skill 是单点能力，Command 是把单点能力串成流水线的编排层。本项目提供两个命令：
+Skill 是单点能力，Command 是把单点能力串成流水线的编排层。本项目提供三个命令：一个用于从零建工程，两个用于日常开发与审查。
 
 | Command | 解决什么问题 | 输入 | 主要产出 | 是否改代码 |
 |---|---|---|---|---|
+| `/android-create-project` | 新工程要建根脚本、build-logic、app 壳和一批 `lib_` / `module_`，顺序错就编译不过 | 工程根目录、工程名、包名域、applicationId、版本号；`-y` 跳过中途确认 | 可编译的多模块骨架：app、build-logic、`lib_common`、`lib_coremodel`、`lib_pay`、`module_home`、`module_me`、`module_login` | 是 |
 | `/android-feature` | 一个功能跨 UI、接口、上屏、审查四段，靠人记顺序容易漏阶段、漏规范 | 设计稿链接 + 接口文档链接 + 功能名，顺序任意；`-y` 跳过中途确认 | XML 与页面骨架、完整网络链路、数据上屏、审查报告 | 阶段一~三改代码，阶段四只审不改 |
 | `/android-review` | 审查只看正确性，不按项目规范逐条比对 | 无参默认审查未提交改动 + 当前分支 diff；也可指定文件、目录或提交 | 分级问题清单 + 最小修复方案 | 否 |
 
+- `/android-create-project` 依次使用 `android-project` → `android-build-logic` → `android-module`，命名全程按 `android-naming`；只建骨架，不生成业务页面与接口。
 - `/android-feature` 内部依次调用 `figma-android-ui`、`android-api-ds`，第四阶段复用 `/android-review` 的标准。
 - `/android-review` 可以脱离流水线单独使用，作为提交前的统一审查入口。
-- 命令的安装与验证见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 2 节，完整用法与示例见 4.5。
+- 命令的安装与验证见 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 2 节，完整用法与示例见 4.6。
 
 ### 0.6 跨客户端复用：Skill 与 Command 不绑定 Qoder
 
-本项目的三个 Skill 和两个 Command 不是 Qoder 专属资产，可以在使用不同客户端的团队成员之间共享。
+本项目的七个 Skill 和三个 Command 不是 Qoder 专属资产，可以在使用不同客户端的团队成员之间共享。
 
 - **Skill 是开放格式**：一个目录 + `SKILL.md`（YAML frontmatter + Markdown 正文）+ 可选的 `references/`、`scripts/`。这是 Agent Skills 的通用约定，Cursor、Trae、CodeBuddy、Claude Code 等客户端都能直接读取同一份内容。
 - **Command 是普通 Markdown**：正文写的是阶段顺序、门禁和停止点，不调用任何 Qoder 专有接口。
@@ -115,7 +125,7 @@ Skill 是单点能力，Command 是把单点能力串成流水线的编排层。
 
 | 客户端 | 推荐方式 |
 |---|---|
-| Qoder CN | 放进 `commands/`，用 `/android-feature`、`/android-review` 调用 |
+| Qoder CN | 放进 `commands/`，用 `/android-create-project`、`/android-feature`、`/android-review` 调用 |
 | Claude Code | `commands/` 下的 Markdown 同样映射为斜杠命令 |
 | Cursor / Trae / CodeBuddy | 支持自定义命令时放对应命令目录；不支持时把命令正文作为规则文件或固定 Prompt 使用，由人按阶段推进 |
 
@@ -161,7 +171,7 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 | 必须熟悉项目架构 | 使用前先读 README、`settings.gradle`、模块职责、基础库、基类、响应封装与命名规范；能说清新代码该落在哪个模块 |
 | 说明文档要能对上代码 | 架构说明、目录约定、命名规范与代码不一致时先修文档；按错误文档写出的 Skill，产出只会错得更整齐 |
 | 规则来自现有代码 | Skill 里的基类名、包名、分层方式、响应封装、DI 方式，都照搬工程现有实现，不额外发明一套 |
-| 按项目实际情况写 Skill | 本项目三个 Skill 只是样例；换项目要按 1.5 改写 references，不是直接复制过去 |
+| 按项目实际情况写 Skill | 本项目的 Skill 只是样例；换项目要按 1.5 改写 references，不是直接复制过去 |
 | 分层不明确就不建议用 | 没有统一基类、网络封装和模块边界时，AI 只能猜；猜出来的代码进不了 Code Review |
 
 **适用性判断**
@@ -238,9 +248,9 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
         ↓
 验证 MCP 连接（10）
         ↓
-安装三个 Skill（1）
+安装七个 Skill（流程 3 + 工程骨架 4）（1）
         ↓
-安装 Commands（/android-feature、/android-review，2）
+安装 Commands（/android-create-project、/android-feature、/android-review，3）
         ↓
 完成项目架构认知
         ↓
@@ -255,13 +265,13 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 |---|---|---|
 | 环境准备 | 0.5 天 | Node、AI 编码客户端、Android Studio 可用 |
 | 凭证与 MCP | 0.5 天 | 两个 MCP 显示「可用 / 已连接」 |
-| Skill 安装 | 10 分钟 | 三个 Skill 出现在技能列表 |
-| Commands 安装 | 5 分钟 | `/android-feature`、`/android-review` 出现在斜杠列表 |
+| Skill 安装 | 10 分钟 | 七个 Skill（三个流程 + `android-naming`、`android-module`、`android-project`、`android-build-logic`）出现在技能列表 |
+| Commands 安装 | 5 分钟 | `/android-create-project`、`/android-feature`、`/android-review` 出现在斜杠列表 |
 | 项目认知 | 0.5~1 天 | 模块职责、分层、资源归属说明 |
 | 试点 | 1 周 | 1 个页面、1 个接口、1 个 Bug 的完整记录 |
 | 推广 | 持续 | 团队使用规范与质量度量 |
 
-### 1.3 三个 Skill 的全景定位
+### 1.3 三个流程 Skill 的全景定位
 
 三个 Skill 分别卡在研发链路的三段高频环节：
 
@@ -280,10 +290,24 @@ mklink /J "%USERPROFILE%\.qoder-cn\skills" "D:\shared-skills"
 | 缺陷修复 | `fix-tapd-android-bug` | 提供 TAPD 链接，说「修复这个 Bug」 | 确认根因、验收修复 |
 | 完整功能 | `figma-android-ui` → `android-api-ds` | `/android-feature <功能名> <设计稿链接> <接口文档链接>` | 确认边界、逐阶段验收 |
 | 提交前审查 | `android-api-ds` + `figma-android-ui` | `/android-review` | 处理问题、决定修复优先级 |
+| 新工程搭建 | `android-project` → `android-build-logic` → `android-module` | `/android-create-project <根目录> <工程名> <包名域>` | 确认模块清单与包名 |
 
-三个 Skill 共用同一套项目规范（MVVM、组件化目录、命名规则），因此可以串起来使用。
+三个流程 Skill 共用同一套项目规范（MVVM、组件化目录、命名规则），因此可以串起来使用。命名规则不在各 Skill 内重复维护，统一由 `android-naming` 提供；工程与模块骨架由 `android-project`、`android-module` 提供。
 
-命令层在此之上做编排：`/android-feature` 把「UI 开发 → 接口联调 → 数据上屏 → 审查」固定成一条流水线，`/android-review` 则把同一套审查标准单独抽出，供提交前复用。
+命令层在此之上做编排：`/android-create-project` 把「工程骨架 → build-logic → `lib_` → `module_`」按依赖顺序固化，`/android-feature` 把「UI 开发 → 接口联调 → 数据上屏 → 审查」固定成一条流水线，`/android-review` 则把同一套审查标准单独抽出，供提交前复用。
+
+### 1.4 四个工程骨架 Skill
+
+流程 Skill 解决「页面、接口、Bug」的日常开发；工程骨架 Skill 解决「工程怎么起、模块怎么建、名字怎么取、编译配置怎么统一」，用在项目启动、模块拆分、组件化改造时。
+
+| Skill | 解决什么 | 触发语句 | 主要产出 |
+|---|---|---|---|
+| `android-project` | 新工程骨架、app 壳、编译配置 | 「新建工程」「搭 app 壳」「配置 flavors」 | 根构建脚本、版本目录、build-logic、app 壳与打包配置 |
+| `android-build-logic` | build-logic 与约定插件 | 「新建 build-logic」「新增约定插件」「统一 compileSdk」 | settings、convention 构建脚本、插件类、support 配置层、插件注册 |
+| `android-module` | 新建业务模块或基础库 | 「创建业务模块 module_user」「新建 lib_xxx」 | `module_*` / `lib_*` 目录、双清单、构建脚本、ARouter 入口、资源与注册 |
+| `android-naming` | 所有命名的唯一来源 | 生成代码、新建模块、新增插件或资源、审查命名时自动引用 | 控件 ID、布局、颜色、类/包、模块、工程名与 applicationId、插件 id 规则 |
+
+依赖关系：`android-project` 建工程骨架 → `android-build-logic` 统一编译配置与插件 → `android-module` 建模块 → `android-naming` 约束所有命名。后三者的 references 只放模板与构建配置，命名规则一律回读 `android-naming`，不重复维护。
 
 ---
 
@@ -315,13 +339,15 @@ Skill 与 Command 都不需要编译或安装依赖，把文件放进客户端�
 | Skill 安装路径、各客户端目录对照、生效验证、项目适配与维护 | [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 1 节 |
 | Command 安装路径、编写要求、加载与验证 | [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md) 第 2 节 |
 
-安装完成后确认：`/skills list` 能看到三个 Skill，输入 `/` 能看到 `android-feature` 和 `android-review`。
+安装完成后确认：`/skills list` 能看到七个 Skill（三个流程 + `android-naming`、`android-module`、`android-project`、`android-build-logic`），输入 `/` 能看到 `android-create-project`、`android-feature` 和 `android-review`。
 
 > 命令与 Skill 不要混放：Skill 进 `skills/`，Command 进 `commands/`。放错目录时，两边都不会出现在列表里。
 
 ---
 
-## 4. 三个 Skill 与两个 Command 的落地
+## 4. 七个 Skill 与三个 Command 的落地
+
+本章按「流程 Skill（4.1~4.3）→ 工程骨架 Skill（4.4）→ 串联与 Command（4.5~4.6）→ 效率（4.7）」展开。流程 Skill 管日常开发，工程骨架 Skill 管工程怎么起、配置怎么统一、模块怎么建、名字怎么取；两边都遵循同一份 `android-naming`。
 
 ### 4.0 落地前统一动作：项目认知
 
@@ -458,13 +484,17 @@ Skill 与 Command 都不需要编译或安装依赖，把文件放进客户端�
 | 底部导航 | BottomNavigationView | 底部 Tab |
 | Dialog 弹窗 | `dlg_*.xml` + Dialog 类 | 独立布局 |
 
-**规范体系：16 份单一职责 reference**
+**规范体系：30 份单一职责 reference**
 
 | 分类 | 文件 | 约束内容 |
 |---|---|---|
-| 命名（12 份） | class / variable / method / layout-file / view-id / color / drawable / image / package / style-theme / animation / string | 每份只讲一类命名，不混规则 |
-| 资源编写（1 份） | drawable-xml-spec | shape、border、ripple、gradient、selector 模板与复用规则 |
-| 代码与结构（3 份） | xml-layout-spec / kotlin-code-style / architecture-spec | 属性顺序、嵌套限制、Kotlin 风格、MVVM 分层 |
+| 命名（15 份，`android-naming`） | class / variable / method / layout-file / view-id / color / drawable / image / package / module / build-logic / style-theme / animation / string / network | 每份只讲一类命名，不混规则；工程名、applicationId、插件 id 也在此 |
+| 接口链路模板（1 份，`android-api-ds`） | code-templates | Req / Data / Api / ApiService / IDS / DS / VM / VMFactory / InjectorUtils 模板 |
+| 资源编写（1 份，`figma-android-ui`） | drawable-xml-spec | shape、border、ripple、gradient、selector 模板与复用规则 |
+| 代码与结构（3 份，`figma-android-ui`） | xml-layout-spec / kotlin-code-style / architecture-spec | 属性顺序、嵌套限制、Kotlin 风格、MVVM 分层 |
+| 模块脚手架（3 份，`android-module`） | business-module / library-module / build-conventions | 业务模块与基础库的全量文件模板、双清单、约定插件与资源前缀 |
+| 工程脚手架（3 份，`android-project`） | project-structure / build-config / app-module | 根构建脚本、版本目录、build-logic、flavors 与签名、app 壳 |
+| 构建逻辑（4 份，`android-build-logic`） | build-logic-structure / convention-plugins / support-utils / troubleshooting | 插件注册与接入、8 个约定插件职责、support 配置层、排查表 |
 
 **关键硬约束**
 
@@ -474,6 +504,7 @@ Skill 与 Command 都不需要编译或安装依赖，把文件放进客户端�
 | 颜色 | `color_XXXXXX`，十六进制字母大写；禁止语义化命名；统一放在 `lib_common/colors.xml` |
 | 控件 ID | `m` + 类型缩写 + 驼峰，如 `mTvTitle`、`mIvBack`、`mEtPhone`、`mRvList` |
 | 布局文件 | 必须带类型前缀：`activity_`、`fragment_`、`dlg_`、`rv_*_cell`、`act_*_header` |
+| 模块 | `app` / `lib_<能力>` / `module_<业务>`，namespace 用 `<域>.lib.<名称>` 或 `<域>.module.<名称>`；目录名、`include(":模块名")`、namespace 三处同步 |
 | 嵌套 | ConstraintLayout 必须保持单层；禁止 ConstraintLayout 嵌套 ConstraintLayout（含 include/merge/自定义控件）；非 ConstraintLayout 容器总层级不超过 2 层 |
 | 属性顺序 | ID → 尺寸 → 约束 → 边距 → 外观 → 内容 → 行为 → tools |
 | 图片 | 从设计稿导出 3x PNG，放 `mipmap-xxhdpi`，文件名去掉 `@3x` |
@@ -736,7 +767,191 @@ Bug 描述与评论矛盾时，**以评论中的技术结论为准**。
 
 ---
 
-### 4.4 三个 Skill 的串联
+### 4.4 四个工程骨架 Skill 的落地
+
+三个流程 Skill 管「日常开发」，四个工程骨架 Skill 管「工程怎么起、编译配置怎么统一、模块怎么建、名字怎么取」。它们只在项目启动、模块拆分、组件化改造、新增约定插件时使用，平时不参与页面与接口开发。
+
+```
+        android-naming（命名唯一来源，始终被引用）
+              ↑              ↑              ↑
+      android-project → android-build-logic → android-module
+        （工程骨架）      （编译配置与插件）      （lib_ / module_）
+```
+
+| Skill | 一句话职责 | 不负责 |
+|---|---|---|
+| `android-project` | 根脚本、版本目录、build-logic 初版、app 壳 | 模块内部结构与插件细节 |
+| `android-build-logic` | 约定插件、support 配置层、插件注册与排查 | 工程骨架、模块业务代码 |
+| `android-module` | `lib_` / `module_` 目录、双清单、构建脚本、ARouter 入口 | 编译配置来源、命名规则 |
+| `android-naming` | 所有命名的唯一来源 | 任何代码生成 |
+
+#### 4.4.1 android-naming：命名唯一来源
+
+**适用场景**
+
+- 生成任何代码或资源（布局、颜色、字符串、Drawable、动画、类与包）
+- 新建工程、新建模块、调整模块结构
+- 新增或修改约定插件
+- 审查时逐项比对命名
+
+**覆盖范围**
+
+| 类别 | 内容 | reference |
+|---|---|---|
+| 资源 | 控件 ID、布局文件、颜色、Drawable、图片、字符串 | view-id / layout-file / color / drawable / image / string |
+| 代码 | 类、变量、方法、包 | class / variable / method / package |
+| 结构 | 工程名、applicationId、模块 `app` / `lib_` / `module_`、namespace、`include` | module-naming |
+| 构建 | `build-logic` / `convention` 目录、插件 id、版本目录别名、`XxxConventionPlugin` | build-logic-naming |
+| 其他 | 样式主题、动画、网络层 Req/Data/Api/DS/VM | style-theme / animation / network |
+
+**规则优先级**：工程现有代码 > 本规范。文档与代码不一致时先判断是有意偏离还是历史遗留；有意偏离就更新规范，历史遗留按规范纠正并在评审中说明。不新增规范里没有的前缀后缀。
+
+**推荐 Prompt**
+
+```text
+按 android-naming 检查这次改动：
+- 范围：<文件 / 目录 / 本次 diff>
+- 重点：控件 ID、布局文件名、颜色、字符串、类与包、网络层成套命名
+- 输出：问题清单（位置 + 现状 + 应改成什么），不改代码
+```
+
+**自检要点**
+
+- 命名与同类现有文件一致，没有新造前缀或后缀
+- 布局文件名后缀与类型匹配（activity_ / fragment_ / dlg_ / rv_）
+- 网络链路命名成套：Req / Data / Api / ApiService / IDS / DS / VM / VMFactory 同一模块名
+- 模块目录名、`include(":模块名")`、namespace 三者一致
+
+#### 4.4.2 android-project：工程骨架与 app 壳
+
+**适用场景**
+
+- 从零新建多模块工程
+- 搭 app 壳、配置 flavors 与 APK 命名
+- 配置组件化开关 `AppBuildConfig.isModule`
+- 补齐版本目录与根构建脚本
+
+**前置条件**
+
+- 根目录尚无 `settings.gradle(.kts)`；已有工程的模块补充交给 `android-module`，不要重建。
+- 先定三项不可逆信息：`rootProject.name`、`applicationId`、应用显示名。`applicationId` 发布后不可修改。
+
+**输入**
+
+| 输入项 | 示例 |
+|---|---|
+| 工程根目录 | `D:\Projects\MyApp` |
+| 工程名 `rootProject.name` | `MyApp` |
+| 包名域 / applicationId | `com.example.myapp` |
+| 应用显示名、版本号 | `我的应用`、`1.0.0` / `1` |
+| 模块清单 | 默认 `lib_common`、`lib_coremodel`、`lib_pay`、`module_home`、`module_me`、`module_login` |
+
+**创建顺序**
+
+1. 根三件套：`settings.gradle.kts`（`includeBuild("build-logic")`）、根 `build.gradle.kts`（插件 `apply false`）、`gradle.properties`
+2. `build-logic` 初版与版本目录
+3. app 壳：构建脚本、清单、`MainActivity`、`activity_main.xml`、基础资源
+4. 用 `android-module` 建 `lib_common`，再建业务模块
+5. 注册 `include` 与 app 依赖，逐模块编译验证
+
+**关键红线**
+
+- 编译配置只有一个来源：SDK、Java 版本、ViewBinding、flavors、签名、混淆、ARouter KSP 全在 `build-logic`，`app` 只留 `namespace`、`applicationId`、壳依赖与 APK 命名。
+- app 只是壳：`MainActivity` 做底部导航 + `ViewPager` + ARouter 取 Fragment，不写业务逻辑；业务页面在各自模块。
+- 清单权限按实际功能裁剪，不整份照抄参考工程。
+- 签名与凭据不进仓库：keystore、密码、地图 key、推送 appId、Bugly AppId 一律不复制，从 `local.properties` 或环境变量读取。
+
+**自检**：`rootProject.name` / `namespace` / `applicationId` 合规；`includeBuild` 与 `include` 齐全；版本目录无硬编码版本；`isModule` 两种模式依赖分支齐全；`:app:assembleDevDebug` 通过。
+
+#### 4.4.3 android-build-logic：约定插件与 support 配置层
+
+**适用场景**
+
+- 首次搭建 `build-logic`
+- 新增约定插件、统一 `compileSdk` / flavors / 签名 / 资源前缀
+- 排查「插件找不到」「catalog 别名无法解析」「validatePlugins 失败」
+
+**8 个约定插件**
+
+| 插件 | 职责 |
+|---|---|
+| `base` | 只被其它约定插件 apply，不直接给模块用 |
+| `application` | `com.android.application` + `base` + `room`，app 壳使用 |
+| `lib` | 基础库配置，`lib_*` 使用 |
+| `module` | 业务模块：`isModule` 切换、`resourcePrefix`、双清单、`api(:lib_common)` |
+| `openSource` | 开源与发布相关配置 |
+| `lint` | 静态检查统一配置 |
+| `jvm.library` | 纯 JVM 模块 |
+| `android.room` | Room + KSP 配置 |
+
+**新增插件的最小步骤**
+
+1. 新建 `XxxConventionPlugin.kt`
+2. 在 `convention/build.gradle.kts` 的 `gradlePlugin` 中 `register`
+3. 在 `gradle/libs.versions.toml` 加**不带 version** 的别名
+4. 需要时在目标模块 `apply`
+
+缺任何一步都会报插件找不到。插件注册统一用 `libs.plugins.<别名>.get().pluginId`，不手写 id 字符串。
+
+**验证**
+
+| 命令 | 验证内容 |
+|---|---|
+| `./gradlew :convention:validatePlugins` | 插件声明合法（`failOnWarning = true`） |
+| `./gradlew help` | build-logic 能否合成、catalog 别名能否解析 |
+| `./gradlew :<模块>:assembleDevDebug` | 插件在模块上是否正确生效 |
+| `./gradlew :app:assembleDevDebug` | 全链路编译、flavor 与签名 |
+
+**关键红线**
+
+- 模块脚本只写 `alias(...)` + `namespace` + 私有依赖，不重复 `compileSdk`、`compileOptions`、`buildTypes`、`buildFeatures`。
+- AGP、Kotlin、Room、KSP 的 Gradle 插件依赖用 `compileOnly`，不用 `implementation`。
+- `base` 不直接给模块 apply；`application` / `module` 已包含 `base` 与 `room`，不重复声明。
+- 凭证不进 `build-logic`：签名密码、分发 token、第三方 AppId 从本地或 CI 注入。
+- 不改已有插件 id，不顺手升级 AGP / Kotlin / KSP。
+
+#### 4.4.4 android-module：业务模块与基础库
+
+**适用场景**
+
+- 新建 `module_<业务>` 或 `lib_<能力>`
+- 模块拆分、组件化改造、模块独立运行
+- 补齐双清单、ARouter 入口、资源与注册
+
+**类型判定**
+
+| 需求 | 类型 | 目录名 | namespace |
+|---|---|---|---|
+| 页面、交互、业务流程 | 业务模块 | `module_<业务>` | `<域>.module.<业务>` |
+| 无页面、可被任意模块依赖的能力 | 基础库 | `lib_<能力>` | `<域>.lib.<能力>` |
+| 打包入口 | 仅 `app` | `app` | `<域>` |
+
+页面进 `module_`，通用能力下沉 `lib_`，两者不混用；`lib_order`、`module_util` 都不合法。
+
+**编译方式判定**
+
+| 工程形态 | 写法 |
+|---|---|
+| 有约定插件（`build-logic/` + `includeBuild`） | `build.gradle.kts` 只写 `alias(...)` + `namespace` + 模块私有依赖 |
+| 无约定插件 | 照抄工程现有 lib 模块的显式 AGP 配置 |
+
+**关键点**
+
+- **双清单**：集成模式用 `src/main/AndroidManifest.xml`；组件模式用 `src/main/module/AndroidManifest.xml`，配 `App`、launcher 与 `tools:replace`，由 `AppBuildConfig.isModule` 切换。
+- **对外入口**：Activity 加 `@Route(path = ARouterPath.XxxAct)`，常量追加到 `lib_common` 的 `ARouterPath.kt`；`companion object` 提供 `intentStart`，跨模块调用只走 `ARouterPath` / `NavigationUtils`。
+- **网络链路不落业务模块**：Req / Data / Api / ApiService / IDS / DS / VM / VMFactory 放 `lib_coremodel`，业务模块通过 `lib_common` 的传递依赖使用。
+- **依赖方向**：`lib_` 只能依赖 `lib_common` 或其它 `lib_`，禁止依赖 `module_`；`module_` 不互相直接 import。
+- **资源前缀由目录名推导**：`module_` 约定插件按其目录名生成 `resourcePrefix`，模块内资源不重复定义 `lib_common` 已有的颜色 / Drawable。
+
+**自检**：目录名、`include`、`namespace`、源码包目录四者一致；双清单齐全且组件模式能独立启动；路由常量与 `@Route` 对应；`./gradlew :<模块名>:assembleDebug` 与 `:app:assembleDebug` 均通过。
+
+> 参考工程的 keystore、签名密码、地图 key、推送 appId、分发 token、Bugly AppId 只作反面示例，任何 Skill 都不会复制到新工程。
+
+四个骨架 Skill 的执行顺序是 `android-project` → `android-build-logic` → `android-module`，命名全程由 `android-naming` 约束。`/android-create-project` 就是把这条顺序固化成命令，见 4.6。
+
+---
+
+### 4.5 三个流程 Skill 的串联
 
 一个新需求通常按以下顺序流转：
 
@@ -754,16 +969,17 @@ TAPD Bug
 
 三个 Skill 共用同一套项目规范，因此可以连续使用。每次切换任务时，重新确认模块、页面和接口边界。
 
-这套人工串联可以固化成 `/android-feature`：命令负责阶段顺序、交接门禁和停止点，规范仍由三个 Skill 提供。用法见 4.5。
+这套人工串联可以固化成 `/android-feature`：命令负责阶段顺序、交接门禁和停止点，规范仍由三个 Skill 提供。用法见 4.6。
 
 ---
 
-### 4.5 用 Commands 把 Skill 串成流水线
+### 4.6 用 Commands 把 Skill 串成流水线
 
 Skill 一次只解决「页面」「接口」或「Bug」。真实需求常常是「新页面 + 新接口 + 数据上屏 + 提交审查」，需要连续调用多个 Skill，并在每次切换时重新交代规范。Commands 把顺序、门禁和停止点写进一条斜杠命令，避免漏阶段、漏规范、漏确认。
 
 | Command | 解决的问题 | 与 Skill 的关系 |
 |---|---|---|
+| `/android-create-project` | 新工程要建根脚本、build-logic、app 壳和一批 `lib_` / `module_`，顺序错就编译不过 | 阶段一用 `android-project` 建骨架，build-logic 交给 `android-build-logic`，每个模块用 `android-module`，命名统一按 `android-naming` |
 | `/android-feature` | 一个功能跨四个阶段，靠人记住顺序和交接 | 阶段一调用 `figma-android-ui`，阶段二调用 `android-api-ds`，阶段四复用 `/android-review` 的标准 |
 | `/android-review` | 审查只看代码正确性，不逐条比对项目规范 | 网络链路按 `android-api-ds`，UI 与资源按 `figma-android-ui` |
 
@@ -771,6 +987,7 @@ Skill 一次只解决「页面」「接口」或「Bug」。真实需求常常�
 
 ```
 Command（编排：顺序 + 门禁 + 停止点）
+   ├── Skill（工程骨架：android-project / android-build-logic / android-module / android-naming）
    ├── Skill（规范与模板：figma-android-ui / android-api-ds / fix-tapd-android-bug）
    └── MCP（数据通道：Figma 设计稿、Swagger 文档、TAPD Bug）
 ```
@@ -791,7 +1008,29 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 - 阶段一不写网络代码，列表用静态占位或空 Adapter；接口就绪后在阶段三替换，不允许用假数据冒充真实上屏。
 - 阶段四只出报告不改代码；确认后才按 P0/P1/P2 修复，且只改本次范围内的代码。
 
-**输入解析规则**
+**/android-create-project 的五个阶段**
+
+| 阶段 | 动作 | 产出 |
+|---|---|---|
+| 一、工程骨架 | 用 `android-project` 生成根脚本、版本目录、build-logic 初版与 app 壳；app 的模块依赖暂留空 | 可运行的空工程 + 初始约定插件 |
+| 二、`lib_common` | 基类（BaseActivity / BaseFragment / BaseWebFragment）、`ARouterPath`、colors / dimens / strings / styles | 所有模块依赖的公共底座 |
+| 三、`lib_coremodel`、`lib_pay` | 网络链路骨架（Req / Data / Api / ApiService / DS / VM / VMFactory / InjectorUtils）与基础能力库 | 接口层与工具库 |
+| 四、`module_home`、`module_me`、`module_login` | 按模块模板生成页面骨架、双清单、路由常量与 logo | 三个可独立运行的业务模块 |
+| 五、整体验证 | `validatePlugins` + `:app:assembleDevDebug` | 可编译的多模块工程 |
+
+- `lib_` 必须先于 `module_`：module 约定插件会自动注入 `api(project(":lib_common"))`，底座缺失时模块脚本无法编译。
+- 每建完一个模块就追加 `settings.gradle.kts` 的 `include` 和 app 依赖，并单独编译一次，避免一次性配置失败后难定位。
+- 只建骨架：不写业务页面、不接真实接口；模块清单可用 `modules=a,b,c` 覆盖，默认三模块。
+- 参考工程若依赖本次清单外的库（如 `lib_http`），命令会停下要求二选一：补建该库，或把网络层并入 `lib_coremodel`。
+
+**/android-create-project 输入规则**
+
+- 第一个存在的绝对路径是工程根目录；目录非空时不覆盖，先确认。
+- 剩余文本中，形如 `com.example.myapp` 的识别为包名域，另一段识别为工程名。
+- `modules=a,b,c` 覆盖默认模块清单；`-y` 跳过中途确认，仍输出每阶段校验结果。
+- applicationId、App 名、版本号和 `lib_http` 处置缺失时一次问齐，不直接开始建目录。
+
+**/android-feature 输入解析规则**
 
 `/android-feature` 不要求固定格式，按内容识别，顺序任意：
 
@@ -810,6 +1049,9 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 **调用示例**
 
 ```text
+# 从零建工程：骨架 → build-logic → lib_ → module_，按依赖顺序执行
+/android-create-project D:\Projects\MyApp MyApp com.example.myapp
+
 # 完整功能，按阶段停下确认
 /android-feature 登录页 https://www.figma.com/design/xxx https://api.xxx.com/doc.html#/login
 
@@ -830,6 +1072,9 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 
 | 场景 | 推荐方式 |
 |---|---|
+| 从零搭多模块工程 | `/android-create-project` |
+| 只补一个模块或基础库 | 直接触发 `android-module` |
+| 只调整 build-logic 或约定插件 | 直接触发 `android-build-logic` |
 | 新页面 + 新接口的完整功能 | `/android-feature` |
 | 已有页面改版，只动 UI | 直接触发 `figma-android-ui` |
 | 只补一个接口 | 直接触发 `android-api-ds` |
@@ -850,7 +1095,7 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 
 ---
 
-### 4.6 提升了哪些方面的开发效率
+### 4.7 提升了哪些方面的开发效率
 
 > 以下效率提升均以「通过质量门禁」为前提，不包含返工和缺陷修复的成本。
 
@@ -926,6 +1171,9 @@ Command 本身不复制业务规则；规范冲突时，仍以 Skill 的 referen
 |---|---|
 | 先完成项目认知，再开始生成 | 未读文档直接让 AI 改代码 |
 | 一个页面 | 一次生成整个模块的所有页面 |
+| 一个模块（`android-module`），先建骨架再接页面 | 一次建多个模块并同时改 `settings.gradle` |
+| 新工程先由 `android-project` 出骨架，再逐模块接入 | 一次生成整套工程并改依赖版本 |
+| 一次一个约定插件（`android-build-logic`） | 同时改多个插件并升级 AGP/Kotlin |
 | 一个接口或一组同模块接口 | 一次接入几十个接口 |
 | 一个 Bug | 一次修一批不相关 Bug |
 | 先试点再批量 | 未确认规范就直接全量生成 |
@@ -1134,6 +1382,45 @@ lib_common 的 BaseActivity/BaseFragment、lib_http 的响应封装、lib_coremo
 - 以评论中的技术结论为准；最小改动；涉及文案时全量检查 XML、strings、硬编码和多语言。
 ```
 
+**新建业务模块**
+
+```text
+在 <工程根目录> 创建业务模块 module_user：
+- 命名与包结构按 android-naming
+- 模块脚手架按 android-module，页面参考 module_wallet
+- 同步 settings.gradle.kts 的 include 与 app 依赖
+- logo 复制 lib_common 的 module_me_logo.xml，只改 fillColor
+- 完成后执行 ./gradlew :module_user:assembleDevDebug 验证
+```
+
+**新建工程骨架**
+
+```text
+参考 <参考工程> 搭建新工程：
+- 命名按 android-naming，模块规范按 android-module
+- app 壳、build-logic、版本目录与编译配置参考 android-project
+- 不要复制参考工程的 keystore、签名密码和第三方 AppKey
+```
+
+**命名检查**
+
+```text
+按 android-naming 检查这次改动：
+- 范围：<文件 / 目录 / 本次 diff>
+- 重点：控件 ID、布局文件名、颜色、字符串、Drawable、类与包、网络层成套命名
+- 输出：问题清单（位置 + 现状 + 应改成什么），不改代码
+```
+
+**新增约定插件**
+
+```text
+在 build-logic 中新增约定插件 <能力>：
+- 插件 id、别名、类名按 android-naming/references/build-logic-naming.md
+- 结构按 android-build-logic，插件类参考 convention 下同类插件
+- 同步 register、libs.versions.toml 别名和需要 apply 的模块
+- 跑 :convention:validatePlugins 与目标模块 assembleDevDebug
+```
+
 ### 11.3 Android 项目目录参考
 
 ```
@@ -1285,8 +1572,8 @@ module_*/src/main/res/
 ### 11.4 上线前检查表
 
 - [ ] 两个 MCP 在桌面端和 IDE 插件中均显示可用 / 已连接。
-- [ ] 三个 Skill 在技能列表中可见，触发语句能识别。
-- [ ] `/android-feature`、`/android-review` 在斜杠列表中可见，且命令正文中的 Skill 路径正确。
+- [ ] 七个 Skill（三个流程 + `android-naming`、`android-module`、`android-project`、`android-build-logic`）在技能列表中可见，触发语句能识别。
+- [ ] `/android-create-project`、`/android-feature`、`/android-review` 在斜杠列表中可见，且命令正文中的 Skill 路径正确。
 - [ ] 项目认知摘要已确认，模块职责和文件落点明确。
 - [ ] 试点页面、接口、Bug 各完成一次完整流程。
 - [ ] 质量门禁和验收清单已纳入 PR 模板。
@@ -1301,6 +1588,10 @@ module_*/src/main/res/
 | 设计还原 | 「根据这个 Figma 链接生成 XX 页面」 | XML + Activity/Fragment + 资源清单 |
 | 接口接入 | 「根据这个 Swagger 生成 XX 模块 XX 动作的网络链路」 | 9 个落点的完整链路 |
 | 缺陷修复 | 「修复这个 TAPD Bug：链接」 | 根因 + 方案 + 代码改动 |
+| 新建工程 | `/android-create-project <根目录> <工程名> <包名域>` | app + build-logic + `lib_` + `module_` 可编译骨架 |
+| 新建模块 | 「创建业务模块 module_user」/「新建 lib_xxx」 | 模块目录、双清单、构建脚本、ARouter 入口 |
+| 新增约定插件 | 「在 build-logic 新增约定插件 XX」 | 插件类 + `register` + catalog 别名 |
+| 命名查询 | 「按 android-naming 检查这段改动」 | 命名问题清单 |
 | 提交前审查 | `/android-review` | 概览 + 分级问题表 + 最小修复方案 |
 | 规范查询 | 「按项目规范检查这个布局」 | 命名、资源、嵌套、属性顺序问题清单 |
 
@@ -1313,9 +1604,9 @@ module_*/src/main/res/
 
 ### 11.6 5 分钟分享提纲
 
-1. **30 秒结论**：三个 Skill 覆盖 UI 开发、接口联调、缺陷修复，`/android-feature` 把它们串成一条流水线，把团队规范变成可执行指令。
-2. **1 分钟全景**：设计稿 → XML，接口文档 → 网络链路，TAPD → 修复方案；命令负责顺序与门禁。
-3. **2 分钟演示**：跑一次 `/android-feature`，展示四个阶段、9 个文件的生成过程和 `/android-review` 的审查报告。
+1. **30 秒结论**：Skill 覆盖建工程、UI 开发、接口联调、缺陷修复，Command 把它们串成流水线，把团队规范变成可执行指令。
+2. **1 分钟全景**：工程骨架 → build-logic → 模块；设计稿 → XML，接口文档 → 网络链路，TAPD → 修复方案；命令负责顺序与门禁。
+3. **2 分钟演示**：先跑 `/android-create-project` 建出可编译骨架，再跑一次 `/android-feature`，展示四个阶段、9 个文件的生成过程和 `/android-review` 的审查报告。
 4. **1 分钟收益与前提**：提效来自减少样板代码、减少信息搬运、减少规范返工；但质量是前提，未通过编译、自测和 Review 的生成结果不计入效率收益。使用前还要先读懂项目架构与模块文档。
 5. **30 秒落地**：先装 Skill 再装 Command，试点三个任务并记录基线，校准后再团队推广。
 
@@ -1323,6 +1614,8 @@ module_*/src/main/res/
 
 | 命令 | 用途 | 说明 |
 |---|---|---|
+| `/android-create-project <根目录> <工程名> <包名域>` | 从零建多模块工程 | 按依赖顺序生成 app、build-logic、`lib_`、`module_`；`modules=` 可覆盖清单 |
+| `/android-create-project ... -y` | 连续建完不设确认点 | 仍输出每阶段校验结果 |
 | `/android-feature <功能名> <设计稿链接> <接口文档链接>` | 一次交付完整功能 | 参数顺序任意；阶段一、二后停下确认 |
 | `/android-feature ... -y` | 连续跑完四阶段 | 仍输出每阶段门禁；不要用于敏感模块 |
 | `/android-review` | 审查未提交改动 + 分支 diff | 只审不改，问题分级输出 |
@@ -1332,12 +1625,13 @@ module_*/src/main/res/
 **最短上手路径**
 
 ```text
-1. 装 Skill（SKILL-MCP-COMMAND配置指南 第 1 节）→ /skills list 确认三个 Skill
-2. 装 Command（SKILL-MCP-COMMAND配置指南 第 2 节）→ 输入 / 确认两个命令
+1. 装 Skill（SKILL-MCP-COMMAND配置指南 第 1 节）→ /skills list 确认七个 Skill 可见
+2. 装 Command（SKILL-MCP-COMMAND配置指南 第 2 节）→ 输入 / 确认三个命令
 3. 项目认知（4.0）→ 确认模块与落点
 4. 单点试点（4.1~4.3）→ 校准 references
-5. 完整功能（4.5）→ /android-feature ... -y
-6. 提交前（4.5）→ /android-review
+5. 骨架试点（4.4）→ 建一个新模块或一个约定插件
+6. 完整功能（4.6）→ /android-feature ... -y
+7. 提交前（4.6）→ /android-review
 ```
 
 ---
@@ -1355,3 +1649,10 @@ module_*/src/main/res/
 | v1.6 | 2026-11-11 | Skill 与 MCP 的配置内容统一收敛到 [SKILL-MCP-COMMAND配置指南.md](SKILL-MCP-COMMAND配置指南.md)，主文档只保留入口与流程；文档更名为「SKILL-MCP-配置指南」 |
 | v1.7 | 2026-11-11 | 指南更名为「SKILL-MCP-COMMAND 配置指南」并新增 Command 配置章节；主文档精简 Skill/Command/MCP 配置与配置类排查，只保留入口、流程与生成结果问题 |
 | v1.8 | 2026-11-11 | 新增 0.7 使用前提：必须熟悉项目架构、规则来自项目架构、按项目实际情况写 Skill；补充适用性判断与「分层不明确先优化项目」的建议 |
+| v1.9 | 2026-11-13 | 新增 `android-naming` Skill：命名规则从 `figma-android-ui`、`android-api-ds` 抽出统一维护；更新安装、验证与检查清单 |
+| v1.10 | 2026-11-13 | `android-naming` 新增模块命名规范：`app` / `lib_<能力>` / `module_<业务>`、namespace 包名、`include` 写法；顶层包名表并入该文件 |
+| v1.11 | 2026-11-13 | 新增 `android-module`（业务模块 `module_wallet` / 基础库 `lib_pay` 脚手架）与 `android-project`（工程骨架、build-logic、app 壳与编译配置）两个 Skill；`android-naming` 补充工程名与 applicationId；同步安装、验证、检查清单与规范体系表 |
+| v1.12 | 2026-11-13 | 新增 `android-build-logic` Skill：build-logic 目录与接入、8 个约定插件职责、support 配置层与排查；`android-naming` 新增构建逻辑命名 |
+| v1.13 | 2026-11-13 | 新增 `/android-create-project` Command：`android-project` → `android-build-logic` → `android-module` 按依赖顺序生成工程与 `lib_` / `module_`；同步 Command 清单、安装验证、速查与调用示例 |
+| v1.14 | 2026-11-13 | 第 4 章补全四个工程骨架 Skill 的落地：`android-naming`（规则优先级与 15 份 references）、`android-project`（创建顺序与红线）、`android-build-logic`（8 个插件与新增插件四步）、`android-module`（类型判定、双清单、ARouter、依赖方向）；新增对应速查行与命名检查 Prompt，章节重排为 4.5~4.7 |
+| v1.15 | 2026-11-13 | 0.3 由「三个流程 Skill」扩为「七个 Skill 一页速览」：补 `android-naming`、`android-project`、`android-build-logic`、`android-module` 四行，标注分组与落地章节；同步技术分享 PPT 新增工程骨架页 |

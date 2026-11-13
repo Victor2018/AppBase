@@ -17,7 +17,7 @@ snake_case（下划线分隔小写）
 ## 应用名称
 
 ```xml
-<string name="app_name">优大集掌柜</string>
+<string name="app_name">应用名称</string>
 ```
 
 ## 导航标题

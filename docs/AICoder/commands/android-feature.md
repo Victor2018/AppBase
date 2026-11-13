@@ -28,9 +28,10 @@ description: Android 功能开发流水线：Figma 出 UI → 接口链路 → �
 
 ## 前置准备（只做一次）
 
-- 读取两个 Skill 及 references：
+- 读取三个 Skill 及 references：
   - figma-android-ui：`C:\Users\81544\.qoder-cn\skills\figma-android-ui\SKILL.md` 及 `references\` 下相关规范
-  - android-api-ds：`C:\Users\81544\.qoder-cn\skills\android-api-ds\SKILL.md`、`references\naming-spec.md`、`references\code-templates.md`
+  - android-api-ds：`C:\Users\81544\.qoder-cn\skills\android-api-ds\SKILL.md`、`references\code-templates.md`
+  - android-naming：`C:\Users\81544\.qoder-cn\skills\android-naming\SKILL.md` 及 `references\` 下与本次任务相关的命名规则（控件 ID、颜色、字符串、类、包、网络层）
 - 扫描项目现有实现，形成「本项目约定」清单：布局与类命名、colors.xml / dimens、BaseRes / NetworkResponse、AbsDS、InjectorUtils、VMFactory、Adapter 写法。后续生成一律以此为准；与 Skill 默认值冲突时以项目现有约定为准并说明。
 - 明确本次范围：新增文件、需要改动的既有文件、可复用的组件。只做本功能，不顺带重构。
 - 若带 `-y`，仍要在每阶段输出简短的门禁摘要后继续。

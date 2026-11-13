@@ -3,7 +3,7 @@ name: figma-android-ui
 description: 将 Figma 设计稿转换为符合 Android 项目规范的 XML 布局文件。使用场景：当用户提供 Figma、MasterGo、即时设计、蓝湖、Sketch、Adobe XD、Photoshop 等设计工具的链接或设计稿截图，需要生成对应的 Android XML 布局代码、Kotlin Activity/Fragment 代码时触发。
 ---
 
-# Figma to Android XML
+# figma-android-ui
 
 将 Figma 设计稿转换为符合 Android 项目规范的 XML 布局文件。
 
@@ -104,23 +104,18 @@ Fragment 容器/叠加层 → FrameLayout
 
 **重要**：在执行任何转换任务前，请先阅读以下规范文档：
 
-### 命名规范（单一职责，每个文件只包含一类命名规则）
+### 命名规范（统一维护在 `android-naming` skill）
 
-| 文件 | 内容 |
-|------|------|
-| `references/class-naming.md` | 类命名规范（Activity, Fragment, VM, DS, Bean 等） |
-| `references/variable-naming.md` | 变量命名规范（成员变量 m 前缀、局部变量、常量） |
-| `references/method-naming.md` | 方法命名规范（initView, subscribeUi, sendRequest 等） |
-| `references/layout-file-naming.md` | 布局文件命名规范（activity_, fragment_, dlg_, rv_ 等） |
-| `references/view-id-naming.md` | 控件 ID 命名规范（mTv, mIv, mBtn 等） |
-| `references/color-naming.md` | 颜色命名规范（color_XXXXXX） |
-| `references/drawable-naming.md` | Drawable 命名规范（shape_, ripple_, border_ 等） |
-| `references/drawable-xml-spec.md` | Drawable XML 编写规范（shape、ripple、gradient 模板） |
-| `references/image-naming.md` | 图片资源命名规范（ic_, img_ 等） |
-| `references/package-naming.md` | 包命名规范 |
-| `references/style-theme-naming.md` | 样式主题命名规范 |
-| `references/animation-naming.md` | 动画命名规范 |
-| `references/string-naming.md` | 字符串命名规范 |
+命名规则不再在本 skill 内重复维护，全部放在 `android-naming` skill 的 `references/` 下，按类别拆分：
+
+| 类别 | 对应文件 |
+|---|---|
+| 控件 ID、布局文件、颜色、Drawable、图片、字符串 | `view-id-naming.md`、`layout-file-naming.md`、`color-naming.md`、`drawable-naming.md`、`image-naming.md`、`string-naming.md` |
+| 类、变量、方法、包 | `class-naming.md`、`variable-naming.md`、`method-naming.md`、`package-naming.md` |
+| 模块（`app` / `lib_` / `module_`）与 namespace | `module-naming.md` |
+| 样式主题、动画 | `style-theme-naming.md`、`animation-naming.md` |
+
+生成文件前先按 `android-naming` 的规则命名；未安装该 skill 时，以工程内同类文件的现有写法为准。
 
 ### 代码与布局规范
 
@@ -135,12 +130,11 @@ Fragment 容器/叠加层 → FrameLayout
 生成文件后，验证以下项目：
 
 ### 布局文件检查
-- [ ] 布局文件名符合命名规范
+- [ ] 控件 ID 与布局文件名符合 `android-naming` 规范
 - [ ] 根标签选择正确
 - [ ] 没有 ConstraintLayout 嵌套 ConstraintLayout（含 include、merge、自定义控件）
 - [ ] ConstraintLayout 保持单层，没有为分组新增 ConstraintLayout 子布局
 - [ ] 命名空间声明完整且顺序正确
-- [ ] 控件 ID 使用 m + 类型缩写 + 驼峰命名
 - [ ] 尺寸引用 `@dimen/dp_*`
 - [ ] 颜色引用 `@color/color_*`
 - [ ] 添加 `tools:ignore="ResourceName"`
@@ -148,14 +142,12 @@ Fragment 容器/叠加层 → FrameLayout
 ### Kotlin 代码检查
 - [ ] 文件头注释完整
 - [ ] 包名符合项目结构
-- [ ] 类命名使用正确的后缀
-- [ ] 方法命名符合规范
-- [ ] 成员变量使用 m 前缀
+- [ ] 类、方法、成员变量命名符合 `android-naming` 规范
 - [ ] 导入顺序正确
 
 ### 资源文件检查
 - [ ] 图片导出为 3x PNG
-- [ ] 图片命名符合规范
+- [ ] 图片命名符合 `android-naming` 规范
 - [ ] 图片存放到 mipmap-xxhdpi
 - [ ] 新颜色添加到 colors.xml
 
@@ -167,6 +159,10 @@ Fragment 容器/叠加层 → FrameLayout
 - **示例**：Figma 测量 24px → Android `@dimen/dp_24`
 
 ## 更新日志
+
+### v1.2.0
+- 命名规范移出到 `android-naming` skill，本 skill 只保留代码与布局规范
+- 参考文档改为指向 `android-naming`，drawable XML 规范中的命名引用同步更新
 
 ### v1.1.0
 - 新增硬性约束：禁止 ConstraintLayout 嵌套 ConstraintLayout，include/merge/自定义控件同样适用

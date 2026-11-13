@@ -94,7 +94,7 @@ private val TAG = "LoginActivity"
 // 定义在 object 单例类中
 object Constant {
     const val JD_BANK_KEY = "JD_BANK_KEY"
-    const val APP_NAME = "优大集掌柜"
+    const val APP_NAME = "应用名称"
     
     // 嵌套 object 分组
     object Action {

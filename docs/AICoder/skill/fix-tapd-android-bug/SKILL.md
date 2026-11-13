@@ -148,6 +148,7 @@ mcp_call("mcp__tapd_mcp__tapd_get_bugs", {
 
 3. **修改代码**：使用 `Edit` 实施修复
    - 遵循项目现有代码风格
+   - 新增控件 ID、字符串、Drawable 或类时，按 `android-naming` skill 的规则命名；未安装时以工程内同类文件的写法为准
    - 保持与现有架构一致（MVVM/MVP 等）
 
 4. **文案修改全面检查** ⭐（涉及界面文案时必做）：

@@ -1,4 +1,4 @@
-# 命名规范 (Naming Specification)
+# 网络层命名规范 (Network Naming Specification)
 
 > 本文档定义 API 数据连接相关代码的命名规则。
 > 适用于所有采用 Retrofit + MVVM 架构的 Android 项目。

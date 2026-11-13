@@ -52,9 +52,10 @@ D:\android_api_ds\
 ├── SKILL.md                      # Skill 主文件
 ├── README.md                     # 本文件
 └── references\
-    ├── naming-spec.md            # 命名规范
     └── code-templates.md         # 代码模板
 ```
+
+命名规范统一维护在 `android-naming` skill 的 `references/network-naming.md`。
 
 ## 依赖的项目结构（默认，可自定义）
 

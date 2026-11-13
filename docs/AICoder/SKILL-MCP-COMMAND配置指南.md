@@ -4,7 +4,7 @@
 >
 > 关联文档：[Android-AI-Coder-落地.md](Android-AI-Coder-落地.md)
 >
-> 版本：v1.3 ｜ 日期：2026-11-11
+> 版本：v1.9 ｜ 日期：2026-11-13
 
 本文讲三件事：Skill 的安装与项目适配、Command 的安装与验证、MCP 的凭证获取与配置。覆盖 Qoder CN 桌面端、Android Studio Qoder CN 插件、Cursor、Trae。Skill 与 Command 的日常使用见主文档。
 
@@ -15,7 +15,7 @@
 | 项目 | 要求 |
 |---|---|
 | Node.js | 已安装 Node.js 18+，终端可执行 `node -v` 和 `npx -v` |
-| Skill 源文件 | 仓库 `skill/` 目录下的三个 Skill：`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug` |
+| Skill 源文件 | 仓库 `skill/` 目录下的七个 Skill：三个流程 Skill（`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug`）+ 四个工程骨架 Skill（命名 `android-naming`、模块 `android-module`、工程 `android-project`、构建逻辑 `android-build-logic`） |
 | 客户端 | Qoder CN 桌面端 / Android Studio Qoder CN 插件 / Cursor / Trae 任选其一 |
 | Figma | 有目标设计稿的访问权限 |
 | TAPD | 有目标项目空间和 Bug 的访问权限 |
@@ -50,39 +50,67 @@ Skill 由 `SKILL.md` 和 `references/` 组成，放进客户端扫描的目录�
 
 ### 1.2 目录结构
 
-把三个 Skill 文件夹放到 skills 目录下：
+把七个 Skill 文件夹（三个流程 Skill + 四个工程骨架 Skill）放到 skills 目录下：
 
 ```
 skills/
 ├── figma-android-ui/
 │   ├── SKILL.md
 │   └── references/
-│       ├── class-naming.md
-│       ├── variable-naming.md
-│       ├── ...
+│       ├── drawable-xml-spec.md
+│       ├── xml-layout-spec.md
+│       ├── kotlin-code-style.md
 │       └── architecture-spec.md
 ├── android-api-ds/
 │   ├── SKILL.md
 │   ├── README.md
 │   └── references/
-│       ├── naming-spec.md
 │       └── code-templates.md
-└── fix-tapd-android-bug/
-    └── SKILL.md
+├── fix-tapd-android-bug/
+│   └── SKILL.md
+├── android-naming/
+│   ├── SKILL.md
+│   └── references/
+│       ├── view-id-naming.md
+│       ├── layout-file-naming.md
+│       ├── color-naming.md
+│       ├── ...
+│       └── network-naming.md
+├── android-module/
+│   ├── SKILL.md
+│   └── references/
+│       ├── business-module.md
+│       ├── library-module.md
+│       └── build-conventions.md
+├── android-project/
+│   ├── SKILL.md
+│   └── references/
+│       ├── project-structure.md
+│       ├── build-config.md
+│       └── app-module.md
+└── android-build-logic/
+    ├── SKILL.md
+    └── references/
+        ├── build-logic-structure.md
+        ├── convention-plugins.md
+        ├── support-utils.md
+        └── troubleshooting.md
 ```
 
 要求：
 
 - 每个 Skill 必须有 `SKILL.md`。
-- 文件夹名、`SKILL.md` 的 frontmatter `name`、Command 中的引用三者保持一致：`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug`。
+- 文件夹名、`SKILL.md` 的 frontmatter `name`、Command 中的引用三者保持一致：`figma-android-ui`、`android-api-ds`、`fix-tapd-android-bug`、`android-naming`、`android-module`、`android-project`、`android-build-logic`。
 - `references/` 中的规范文件保持单一职责，不要把命名、布局、代码风格混在一个文件里。
+- 命名规则只维护在 `android-naming`（共 15 份 references），其余 Skill 不再重复放命名文件；模块与工程的目录、namespace、applicationId、约定插件 id 规则也以它为准。
 
 ### 1.3 安装与加载
 
 **方式一：手动复制（用户级）**
 
 ```text
-把 figma-android-ui、android-api-ds、fix-tapd-android-bug 三个文件夹
+把 figma-android-ui、android-api-ds、fix-tapd-android-bug、
+android-naming、android-module、android-project、android-build-logic 七个文件夹
 复制到 C:\Users\<用户名>\.qoder-cn\skills\
 ```
 
@@ -90,7 +118,7 @@ skills/
 
 ```text
 在项目根目录创建 .qoder\skills\
-把三个 Skill 文件夹复制进去
+把七个 Skill 文件夹复制进去
 ```
 
 **加载**
@@ -109,22 +137,45 @@ skills/
 
 验证方式：
 
-1. 三个 Skill 都出现在列表中。
-2. 输入触发语句，例如「根据这个 Swagger 文档生成网络请求代码」，客户端能识别并调用 `android-api-ds`。
+1. 七个 Skill（三个流程 Skill + `android-naming`、`android-module`、`android-project`、`android-build-logic`）都出现在列表中。
+2. 输入触发语句，客户端能识别并调用对应 Skill：
+
+| 输入示例 | 应调用 |
+|---|---|
+| 「根据这个 Swagger 文档生成网络请求代码」 | `android-api-ds` |
+| 「按这个设计稿生成页面布局」 | `figma-android-ui` |
+| 「修复这个 TAPD Bug：<链接>」 | `fix-tapd-android-bug` |
+| 「按 android-naming 检查这次改动的命名」 | `android-naming` |
+| 「创建业务模块 module_user」 | `android-module` |
+| 「新建一个 Android 工程」 | `android-project` |
+| 「新增一个约定插件」 | `android-build-logic` |
+
 3. 如果没识别，检查文件夹层级是否多套了一层，例如 `skills/android-api-ds/android-api-ds/SKILL.md` 是错误结构。
 
 ### 1.5 Skill 与项目的适配
 
-三个 Skill 内置的是参考项目的规范。换到新项目时，先确认并调整：
+这七个 Skill 内置的是参考项目的规范。换到新项目时，先确认并调整：
 
 | 文件 | 需要确认的内容 |
 |---|---|
 | `android-api-ds/references/code-templates.md` | 基类名、包名、响应封装、DataSource 基类 |
-| `android-api-ds/references/naming-spec.md` | 实体、Service、DS、VM 的命名 |
-| `figma-android-ui/references/package-naming.md` | 项目的模块名和包名 |
+| `android-naming/references/network-naming.md` | 实体、Service、DS、VM 的命名 |
+| `android-naming/references/package-naming.md` | 模块内的包结构（view/data/util 等） |
+| `android-naming/references/module-naming.md` | 模块目录（`app` / `lib_` / `module_`）、namespace、`include`、`applicationId` |
+| `android-naming/references/build-logic-naming.md` | `build-logic` / `convention` 目录、插件 id、`ydj-*` 别名、`XxxConventionPlugin` 类名 |
+| `android-naming/references/color-naming.md` | 颜色是否统一放在 `lib_common` |
+| `android-naming/references/` 其余命名文件 | 控件 ID、布局文件名、类名、方法/变量、字符串、Drawable 与图片、主题与动画的命名前缀 |
 | `figma-android-ui/references/architecture-spec.md` | 模块依赖、DI、路由、事件总线 |
-| `figma-android-ui/references/color-naming.md` | 颜色是否统一放在 `lib_common` |
 | `figma-android-ui/references/drawable-xml-spec.md` | Drawable 复用和创建规则 |
+| `android-module/references/build-conventions.md` | 约定插件名、`isModule` 开关、双清单切换、资源前缀 |
+| `android-module/references/business-module.md` | 页面参考模块（默认 `module_wallet`）、页面模板、logo 模板 `module_me_logo` |
+| `android-module/references/library-module.md` | 基础库参考模块（默认 `lib_pay`）、对外 Helper 写法 |
+| `android-project/references/project-structure.md` | `settings.gradle.kts`、根构建脚本、版本目录、`build-logic` 插件注册 |
+| `android-project/references/build-config.md` | `AppBuildConfig` / `AppSignConfig`、flavors、签名与 APK 命名 |
+| `android-project/references/app-module.md` | `app` 壳的构建脚本、清单、MainActivity 与底部导航 |
+| `android-build-logic/references/build-logic-structure.md` | `build-logic/settings.gradle.kts`、`convention/build.gradle.kts`、插件注册与 `includeBuild` 接入 |
+| `android-build-logic/references/convention-plugins.md` | 8 个约定插件的职责、apply 关系与代码骨架 |
+| `android-build-logic/references/support-utils.md` | `AppBuildConfig` / `AppSignConfig` / `KotlinAndroid`、flavors、签名与分发 |
 
 > Skill 不是装完就结束。项目基类或目录调整后，要同步更新 references，否则生成结果会和工程实际脱节。
 
@@ -157,12 +208,13 @@ Command 是 `commands` 目录下的一份 Markdown 文件，**文件名即命令
 | 用户级 | `C:\Users\<用户名>\.qoder-cn\commands\` | 个人使用，所有项目可调用 |
 | 项目级 | `<项目根目录>\.qoder\commands\` | 团队共享，跟随仓库版本管理 |
 
-把仓库中的两个命令文件复制进去：
+把仓库中的三个命令文件复制进去：
 
 ```
 commands/
-├── android-feature.md     # 调用名：/android-feature
-└── android-review.md      # 调用名：/android-review
+├── android-create-project.md   # 调用名：/android-create-project
+├── android-feature.md          # 调用名：/android-feature
+└── android-review.md           # 调用名：/android-review
 ```
 
 要求：
@@ -170,17 +222,28 @@ commands/
 - 文件名使用 kebab-case，与调用名一致：`android-feature.md` → `/android-feature`。
 - frontmatter 只写 `description`，用于斜杠列表中的说明。
 - 命令正文里引用的 Skill 路径必须是本机真实存在的路径；项目级安装时，路径改成团队约定的位置。
-- Command 依赖第 1 节安装的三个 Skill，先装 Skill 再装 Command。
+- Command 依赖第 1 节安装的 Skill，先装 Skill 再装 Command：日常开发命令依赖三个流程 Skill（命名由 `android-naming` 提供）；`/android-create-project` 还依赖 `android-project`、`android-module`、`android-build-logic`。
 - 命令正文引用 Skill 时优先写名称（如 `figma-android-ui`），不要写死客户端专属的绝对路径，便于在其他客户端复用。
+
+**三个命令的分工**
+
+| Command | 阶段 | 依赖 Skill |
+|---|---|---|
+| `/android-create-project` | 工程骨架 → `lib_common` → `lib_coremodel` / `lib_pay` → 业务模块 → 收口验证 | `android-project`、`android-build-logic`、`android-module`；命名全程按 `android-naming` |
+| `/android-feature` | UI 还原 → 接口链路 → 数据上屏 → 审查 | `figma-android-ui`、`android-api-ds`，最后复用 `/android-review` 的标准 |
+| `/android-review` | 概览 → 问题表 → 修复方案 | `android-api-ds`（网络链路）、`figma-android-ui`（UI 与资源），命名按 `android-naming` |
+
+`/android-create-project` 的每一阶段都要编译通过才进入下一阶段；未带 `-y` 时每阶段停下确认，带了 `-y` 也仍输出门禁摘要。
 
 > 其他客户端没有自定义斜杠命令机制时，把命令正文当作规则文件或固定 Prompt 使用即可，编排逻辑不变，见主文档 0.6。
 
 ### 2.1 加载与验证
 
-1. 重新打开客户端，或在对话输入 `/`，列表中应出现 `android-feature` 和 `android-review`。
+1. 重新打开客户端，或在对话输入 `/`，列表中应出现 `android-create-project`、`android-feature` 和 `android-review`。
 2. 输入 `/android-feature` 不带参数，应一次性问齐设计稿链接、接口文档链接和功能名，而不是报错。
 3. 输入 `/android-review`，应先读取 diff，再输出「概览 → 问题表 → 修复方案」。
-4. 看不到命令时，确认文件在 `commands` 目录、扩展名是 `.md`，再重开客户端或重启 IDE。
+4. 输入 `/android-create-project` 不带参数，应一次性问齐工程根目录、工程名、包名域、applicationId、App 名、版本号与 `lib_http` 处置，而不是直接开始建目录。
+5. 看不到命令时，确认文件在 `commands` 目录、扩展名是 `.md`，再重开客户端或重启 IDE。
 
 > 命令与 Skill 不要混放：Skill 进 `skills/`，Command 进 `commands/`。放错目录时，两边都不会出现在列表里。
 
@@ -193,7 +256,8 @@ commands/
 | 命令执行但不按规范 | Skill 未安装，或命令中引用的 Skill 路径不存在 | 先完成第 1 节的 Skill 安装；核对命令正文里的路径与本机一致 |
 | 参数被识别错 | 链接域名不在识别列表，或文本与链接混排 | 显式写「设计稿：<链接>」「接口文档：<链接>」「功能名：<名称>」 |
 | 想每阶段确认却一路跑完 | 输入了 `-y` | 去掉 `-y`；或在任务开始时说明「每阶段停下等我确认」 |
-| 命令只跑了 UI 就结束 | 未提供接口文档，或接口未定稿 | 补齐接口文档；按主文档 4.5 的「什么时候用命令」改为单点 Skill |
+| 命令只跑了 UI 就结束 | 未提供接口文档，或接口未定稿 | 补齐接口文档；按主文档 4.6 的命令分工改为单点 Skill |
+| `/android-create-project` 中途停住 | 目标目录非空，或 `lib_http` 未决策 | 换空目录或确认沿用；明确 `lib_http` 是补建还是并入 `lib_coremodel` |
 | 命令与项目级 Skill 冲突 | 项目级和用户级同名 Skill 并存 | 只保留一处；团队规范统一用项目级 |
 | 换用其他客户端后 `/` 里没有命令 | 该客户端不支持自定义斜杠命令 | 把命令正文作为规则文件或固定 Prompt 使用；Skill 仍可单独触发（见主文档 0.6） |
 
@@ -554,3 +618,12 @@ npx -y figma-developer-mcp --stdio
 ```
 
 如果移动了文档，需要同步调整图片路径。
+
+---
+
+## 13. 版本记录
+
+| 版本 | 日期 | 说明 |
+|---|---|---|
+| v1.8 | 2026-11-13 | Skill 配置扩为七个：新增 `android-naming`、`android-module`、`android-project`、`android-build-logic` 的目录、安装、适配与验证；命名规则收敛到 `android-naming` |
+| v1.9 | 2026-11-13 | 与落地文档 v1.15、14 页技术分享 PPT 对齐：1.4 补七个 Skill 的触发语句对照表，1.5 补其余命名文件的适配项，第 2 节补三个命令的分工与 `/android-create-project` 五阶段门槛，新增版本记录 |

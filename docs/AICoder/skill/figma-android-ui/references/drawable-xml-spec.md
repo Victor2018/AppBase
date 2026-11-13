@@ -1,6 +1,7 @@
 # Drawable XML 编写规范 (Drawable XML Specification)
 
 > 本文档定义 Android Drawable XML 文件的编写规则和模板。
+> 文件名规则统一见 `android-naming` skill 的 `references/drawable-naming.md`；下文示例中注释标注的就是完整文件名。
 
 ## 目录
 
@@ -18,12 +19,6 @@
 ---
 
 ## 1. 实心圆角矩形 (shape)
-
-### 文件命名
-
-```
-shape_颜色_radius_圆角值.xml
-```
 
 ### 模板
 
@@ -68,25 +63,6 @@ shape_颜色_radius_圆角值.xml
 ---
 
 ## 2. 带方向圆角矩形
-
-### 文件命名
-
-```
-shape_颜色_方向_radius_圆角值.xml
-```
-
-### 方向缩写
-
-| 缩写 | 含义 |
-|------|------|
-| `top` | 顶部（左上+右上） |
-| `bottom` | 底部（左下+右下） |
-| `left` | 左侧（左上+左下） |
-| `right` | 右侧（右上+右下） |
-| `lt` | 左上 (left-top) |
-| `lb` | 左下 (left-bottom) |
-| `rt` | 右上 (right-top) |
-| `rb` | 右下 (right-bottom) |
 
 ### 模板
 
@@ -163,12 +139,6 @@ shape_颜色_方向_radius_圆角值.xml
 
 ## 3. 边框圆角矩形 (border)
 
-### 文件命名
-
-```
-border_边框颜色_radius_圆角值.xml
-```
-
 ### 模板
 
 ```xml
@@ -222,12 +192,6 @@ border_边框颜色_radius_圆角值.xml
 
 ## 4. 边框+填充圆角矩形
 
-### 文件命名
-
-```
-border_边框色_填充色_radius_圆角值.xml
-```
-
 ### 模板
 
 ```xml
@@ -260,12 +224,6 @@ border_边框色_填充色_radius_圆角值.xml
 ---
 
 ## 5. 水波纹效果 (ripple)
-
-### 文件命名
-
-```
-ripple_颜色_radius_圆角值.xml
-```
 
 ### 模板（有底色）
 
@@ -346,12 +304,6 @@ ripple_颜色_radius_圆角值.xml
 
 ## 6. 渐变效果 (gradient)
 
-### 文件命名
-
-```
-gradient_起始色_结束色[_radius_圆角值].xml
-```
-
 ### 线性渐变模板
 
 ```xml
@@ -416,12 +368,6 @@ gradient_起始色_结束色[_radius_圆角值].xml
 ---
 
 ## 7. 选择器 (selector)
-
-### 文件命名
-
-```
-功能_selector.xml
-```
 
 ### 按钮选择器模板
 
@@ -673,16 +619,7 @@ lib_common/src/main/res/drawable/
 
 ### 命名规范
 
-创建新 shape 必须遵循命名规范（详见 drawable-naming.md）：
-
-```
-shape_颜色_radius_圆角值.xml          # 实心圆角
-shape_颜色_方向_radius_圆角值.xml     # 带方向圆角
-border_边框色_radius_圆角值.xml       # 边框
-border_边框色_填充色_radius_圆角值.xml # 边框+填充
-ripple_颜色_radius_圆角值.xml         # 水波纹
-gradient_起始色_结束色.xml            # 渐变
-```
+新建 shape 的文件名遵循 `android-naming` skill 的 `references/drawable-naming.md`，本文不重复列出格式。
 
 ### 引用方式
 

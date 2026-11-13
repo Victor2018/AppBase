@@ -1,7 +1,7 @@
 ---
 name: android-api-ds
 description: 根据接口文档生成符合 Android 项目规范的网络请求代码。使用场景：当用户提供 Swagger/Knife4j 接口文档链接或截图，需要生成请求实体类、响应实体类、API接口、DataSource、ViewModel 等完整网络请求链路代码时触发。适用于所有采用 Retrofit + MVVM 架构的 Android 项目。
-version: 2.0.1
+version: 2.0.2
 ---
 
 # Android API 数据连接生成器
@@ -101,10 +101,7 @@ version: 2.0.1
 
 ### Step 2: 确定命名
 
-根据命名规范（见 `references/naming-spec.md`）确定：
-- 模块名：大驼峰（如 `SubAccount`）
-- 动作名：小驼峰（如 `add`、`getList`）
-- 各类文件名称
+按 `android-naming` skill 的 `references/network-naming.md` 确定模块名、动作名，以及各层文件、方法、常量的名称；未安装该 skill 时，以工程内同类接口链路的写法为准。
 
 ### Step 3: 生成代码文件
 
@@ -132,8 +129,9 @@ version: 2.0.1
 
 | 文件 | 内容 |
 |------|------|
-| `references/naming-spec.md` | 命名规范（类名、方法名、常量名） |
 | `references/code-templates.md` | 代码模板（各层级的完整模板） |
+
+命名规范（模块与动作、各层文件、方法、常量、动作映射表）统一维护在 `android-naming` skill 的 `references/network-naming.md`；未安装该 skill 时，以工程内现有接口链路的写法为准。
 
 ## 类型映射表
 
@@ -182,10 +180,7 @@ NetworkResponse<BaseRes<Nothing>, HttpError>
 - [ ] import 语句完整
 
 ### 命名规范检查
-- [ ] 请求类：`{动作}{模块}Req`
-- [ ] 响应类：`{模块}Data` 或 `{模块}Bean`
-- [ ] API常量：大写下划线（如 `ADD`、`GET_LIST`）
-- [ ] 方法名：小驼峰动词（如 `addSubAccount`）
+- [ ] 请求类、响应类、API 常量、方法名符合 `android-naming` 的 `references/network-naming.md`
 
 ### 代码风格检查
 - [ ] 字段使用可空类型 `?`
@@ -221,6 +216,10 @@ NetworkResponse<BaseRes<Nothing>, HttpError>
 - `HttpResult<T>` / `Result<T>` / `Resource<T>`
 
 ## 更新日志
+
+### v2.0.2
+- 命名规范移出到 `android-naming` skill 的 `references/network-naming.md`
+- 只保留代码模板，参考文档与 Step 2 改为指向 `android-naming`
 
 ### v2.0.1
 - 无数据返回的接口统一使用 `Nothing` 泛型，禁止使用 `Any?`
